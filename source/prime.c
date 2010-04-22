@@ -91,7 +91,7 @@ R_RANDOM_STRUCT *randomStruct; /* random structure */
         NN_Add(a, a, d, digits);
     }
 
-    return(IDOK);
+    return(ID_OK);
 }
 
 /* Returns nonzero iff a is a probable prime.
@@ -240,7 +240,8 @@ unsigned int aDigits;
         8089, 8093, 8101, 8111, 8117, 8123, 8147, 8161,
         8167, 8171, 8179, 8191, 0
     };
-    unsigned int i,x;
+
+    unsigned int i;
 
     status = 1;
 

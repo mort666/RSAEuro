@@ -6,9 +6,9 @@
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
 	All functions prototypes are the Same as for RSAREF(tm).
-	To aid compatiblity the source and the files follow the
-	same naming comventions that RSAREF(tm) uses.  This should aid
-				direct importing to your applications.
+	To aid compatibility the source and the files follow the
+	same naming conventions that RSAREF(tm) uses.  This should aid
+    direct importing to your applications.
 
 	This library is legal everywhere outside the US.  And should
 	NOT be imported to the US and used there.
@@ -29,6 +29,12 @@
 
 	0.93 Fourth revision, Library details section added, MD4 details
 	added to header file, digest contexts altered.
+
+    1.03 Fifth revision, RSA key structures altered.
+
+    1.04 Sixth revision, New error types added, fix under windows
+    regarding IDOK define. RSAEUROINFO release stuff added.
+
 */
 
 #ifndef _RSAEURO_H_
@@ -61,6 +67,7 @@ extern "C" {
 #define EA_DES_EDE2_CBC 2
 #define EA_DES_EDE3_CBC 3
 #define EA_DESX_CBC 4
+
 
 /* RSA key lengths. */
 
@@ -112,23 +119,50 @@ extern "C" {
 #define RE_SIGNATURE 0x040b
 #define RE_SIGNATURE_ENCODING 0x040c
 #define RE_ENCRYPTION_ALGORITHM 0x040d
+#define RE_FILE 0x040e
 
 /* Library details. */
 
 #define RSAEURO_VER_MAJ 1
-#define RSAEURO_VER_MIN 02
-#define RSAEURO_IDENT "RSAEURO"
+#define RSAEURO_VER_MIN 04
+#define RSAEURO_IDENT "RSAEURO Toolkit"
 #define RSAEURO_DATE "21/08/94"
 
 /* Internal Error Codes */
 
-#define IDOK    0
-#define IDERROR 1
+/* IDOK and IDERROR changed to ID_OK and ID_ERROR */
+
+#define ID_OK    0
+#define ID_ERROR 1
 
 /* Internal defs. */
 
 #define TRUE    1
 #define FALSE   0
+
+/* Algorithm IDs */
+
+#define IA_MD2 0x00000001
+#define IA_MD4 0x00000002
+#define IA_MD5 0x00000004
+#define IA_SHS 0x00000008
+#define IA_DES_CBC 0x00000010
+#define IA_DES_EDE2_CBC 0x00000020
+#define IA_DES_EDE3_CBC 0x00000040
+#define IA_DESX_CBC 0x00000080
+#define IA_RSA 0x00010000
+#define IA_DH  0x00020000
+
+#define IA_FLAGS (IA_MD2|IA_MD4|IA_MD5|IA_SHS|IA_DES_CBC|IA_DES_EDE2_CBC|IA_DES_EDE3_CBC|IA_DESX_CBC|IA_RSA|IA_DH)
+
+/* RSAEuro Info Structure */
+
+typedef struct {
+    unsigned short int Version;                 /* RSAEuro Version */
+    unsigned int flags;                         /* Version Flags */
+    unsigned char ManufacturerID[32];           /* Toolkit ID */
+    unsigned int Algorithms;                    /* Algorithms Supported */
+} RSAEUROINFO;
 
 /* Random structure. */
 

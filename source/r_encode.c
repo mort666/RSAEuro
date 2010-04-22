@@ -109,7 +109,7 @@ unsigned int blockLen;          /* length of block */
 
 	if(blockLen < 1) {
 		*encodedBlockLen = 0;
-		return (IDOK);
+		return (ID_OK);
 	}
 
 	*encodedBlockLen = 0;
@@ -121,7 +121,7 @@ unsigned int blockLen;          /* length of block */
 		*encodedBlockLen += 4;
 	}
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 int R_DecodePEMBlock (outbuf, outlength, inbuf, inlength)
@@ -140,7 +140,7 @@ unsigned int inlength;          /* length of encoded block */
 
 	if(inlength < 1) {
 		*outlength = 0;
-		return (IDOK);
+		return (ID_OK);
 	}
 
 
@@ -184,7 +184,7 @@ unsigned int inlength;          /* length of encoded block */
 	}
 
 	*outlength = length;
-	return(IDOK);   /* normal return */
+	return(ID_OK);   /* normal return */
 
 }
 

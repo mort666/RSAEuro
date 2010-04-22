@@ -33,6 +33,12 @@
         1.02 Fourth revision, R_SealUpdate Bug fixed, Bug Reported by
         Anders Heerfordt <i3683@dc.dk>.  PADDING problem array incorrectly
         setup, reported by Anders Heerfordt <i3683@dc.dk>.
+
+        1.04 Fifth revision, PADDING problem fixed again, reported by 
+        Jonathan Ruano <jonah@encomix.es>.  R_RSAEuroInfo routine added
+        to give basic info on toolkit.
+
+
 */
 
 #include "rsaeuro.h"
@@ -63,7 +69,7 @@ static unsigned char *PADDING[] = {
     (unsigned char *)"\05\05\05\05\05",
     (unsigned char *)"\06\06\06\06\06\06",
     (unsigned char *)"\07\07\07\07\07\07\07",
-    (unsigned char *)"\08\08\08\08\08\08\08\08"
+    (unsigned char *)"\010\010\010\010\010\010\010\010"
 };
 
 #define MAX_ENCRYPTED_KEY_LEN MAX_RSA_MODULUS_LEN
@@ -73,9 +79,34 @@ static int R_CheckDigestInfo PROTO_LIST ((unsigned char *, unsigned char *));
 
 		/* encrypt prototypes */
 
-static int CipherInit PROTO_LIST((R_ENVELOPE_CTX *, int, unsigned char *, unsigned char *, int));
+static int CipherInit PROTO_LIST((R_ENVELOPE_CTX *, int, unsigned char *, int, unsigned char *, int));
 static void EncryptBlk PROTO_LIST((R_ENVELOPE_CTX *, unsigned char *, unsigned char *, unsigned int));
 static void RestartCipher PROTO_LIST((R_ENVELOPE_CTX *));
+
+/*
+    Return RSAEuro version information including Algorithms
+    supported by this version of RSAEuro.
+
+    Also Version number, flags and Ident of Toolkit.
+
+    New to version 1.04
+*/
+
+void R_RSAEuroInfo(info)
+RSAEUROINFO *info;              /* info structure */
+{
+    /* Blank structure before use */
+    R_memset(info, 0x00, sizeof(RSAEUROINFO));
+
+    info->Version = (RSAEURO_VER_MAJ << 8) | RSAEURO_VER_MIN;
+
+    /* setup flags and algorithms supported */
+    info->Algorithms = IA_FLAGS;
+    info->flags = 0;
+
+    /* Copy toolkit ID to info structure */
+    R_memcpy(info->ManufacturerID, RSAEURO_IDENT, sizeof(RSAEURO_IDENT));
+}
 
 int R_DigestInit(context, digesttype)
 R_DIGEST_CTX *context;          /* new context */
@@ -104,7 +135,7 @@ int digesttype;                 /* message-digest algorithm */
 		return(RE_DIGEST_ALGORITHM);
 	}
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 int R_DigestUpdate(context, partIn, partInLen)
@@ -133,7 +164,7 @@ unsigned int partInLen;         /* length of next data part */
 		return(RE_DIGEST_ALGORITHM);
 	}
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 int R_DigestFinal(context, digest, digestLen)
@@ -164,7 +195,7 @@ unsigned int *digestLen;        /* length of message digest */
 		return(RE_DIGEST_ALGORITHM);
 	}
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Signing a file using SHS is not allowed for now */
@@ -299,7 +330,7 @@ R_RANDOM_STRUCT *randomStruct;  /* random structure */
 					/* Make both E keys the same */
 				R_memcpy ((POINTER)(key + 16), (POINTER)key, 8);
 
-			if((status = CipherInit (context, encryptionAlgorithm, key, iv, 1)) == 0) {
+			if((status = CipherInit (context, encryptionAlgorithm, key, keyLen, iv, 1)) == 0) {
 				for(i = 0; i < publicKeyCount; ++i) {
 					if(RSAPublicEncrypt(encryptedKeys[i], &encryptedKeyLens[i], key, keyLen,
 							 publicKeys[i], randomStruct)) {
@@ -337,7 +368,7 @@ unsigned int partInLen;         /* length of next data part */
 		*partOutLen = 0;
 		R_memcpy((POINTER)(context->buffer + context->bufferLen), (POINTER)partIn, partInLen);
         context->bufferLen += partInLen;    /* Bug Fix - 02/09/95, SK */
-		return(IDOK);
+		return(ID_OK);
 	}
 
 	/* Fill the buffer and encrypt. */
@@ -361,7 +392,7 @@ unsigned int partInLen;         /* length of next data part */
 	/* Length now less than 8, so copy remainder to buffer for next time. */
 	R_memcpy((POINTER)context->buffer, partIn, context->bufferLen = partInLen);
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Assume partOut buffer is at least 8 bytes. */
@@ -385,7 +416,7 @@ unsigned int *partOutLen;       /* length of last encrypted data part */
 	RestartCipher(context);
 	context->bufferLen = 0;
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Assume caller has already ASCII decoded the encryptedKey if necessary. */
@@ -413,13 +444,13 @@ R_RSA_PRIVATE_KEY *privateKey;  /* recipient's RSA private key */
 		if(encryptionAlgorithm == EA_DES_CBC) {
 			if(keyLen != 8) status = RE_PRIVATE_KEY;
 			else{
-				if((status = CipherInit (context, encryptionAlgorithm, key, iv, 0)) == 0)
+				if((status = CipherInit (context, encryptionAlgorithm, key, keyLen, iv, 0)) == 0)
 					context->bufferLen = 0;
 			}
 		}else{
 			if(keyLen != 24) status = RE_PRIVATE_KEY;
 			else {
-				if((status = CipherInit (context, encryptionAlgorithm, key, iv, 0)) == 0)
+				if((status = CipherInit (context, encryptionAlgorithm, key, keyLen, iv, 0)) == 0)
 					context->bufferLen = 0;
 			}
 		}
@@ -450,7 +481,7 @@ unsigned int partInLen;         /* length of next encrypted data part */
 		*partOutLen = 0;
 		R_memcpy((POINTER)(context->buffer + context->bufferLen), partIn, partInLen);
 		context->bufferLen += partInLen;
-		return(IDOK);
+		return(ID_OK);
 	}
 
 	/* Fill the buffer and decrypt.  We know that there will be more left
@@ -477,7 +508,7 @@ unsigned int partInLen;         /* length of next encrypted data part */
 
 	R_memcpy((POINTER)context->buffer, partIn, context->bufferLen = partInLen);
 
-	return (IDOK);
+	return (ID_OK);
 }
 
 /* Assume partOut buffer is at least 7 bytes. */
@@ -556,7 +587,7 @@ R_RSA_PRIVATE_KEY *privateKey;         /* signer's RSA private key */
 
 	R_EncodePEMBlock(encodedSignature, encodedSignatureLen, signature, signatureLen);
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 int R_SignBlock(signature, signatureLen, block, blockLen, digestAlgorithm, privateKey)
@@ -839,7 +870,7 @@ unsigned int inputLen;            /* length */
 
 	R_memset(encryptedPart, 0, sizeof(encryptedPart));
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Assumes that digestAlgorithm is DA_MD2, DA_MD4 or DA_MD5 and
@@ -866,13 +897,19 @@ unsigned char *originaldigestInfo;
 unsigned char *digestInfo;
 {
 	return((originaldigestInfo[DIGEST_INFO_A_LEN] ==
-		digestInfo[DIGEST_INFO_A_LEN]) ? IDOK : RE_SIGNATURE);
+		digestInfo[DIGEST_INFO_A_LEN]) ? ID_OK : RE_SIGNATURE);
 }
 
-static int CipherInit(context, encryptionAlgorithm, key, iv, encrypt)
+/*
+    Blowfish uses a keyLen value during startup, this was added to this routine
+    for version 1.10 of RSAEuro.
+*/
+
+static int CipherInit(context, encryptionAlgorithm, key, keyLen, iv, encrypt)
 R_ENVELOPE_CTX *context;
 int encryptionAlgorithm;
 unsigned char *key;
+int keyLen;
 unsigned char *iv;
 int encrypt;
 {
@@ -890,7 +927,7 @@ int encrypt;
 	default:
 		return (RE_ENCRYPTION_ALGORITHM);
 	}
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Assume len is a multiple of 8.
@@ -911,6 +948,7 @@ unsigned int len;
 	case EA_DES_EDE2_CBC:
 	case EA_DES_EDE3_CBC:
 		DES3_CBCUpdate (&context->cipherContext.des3, output, input, len);
+        break;
 	}
 }
 

@@ -138,7 +138,7 @@ R_RSA_PUBLIC_KEY *publicKey;    /* RSA public key */
 
 	R_memset((POINTER)pkcsBlock, 0, sizeof(pkcsBlock));
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* RSA encryption, according to RSADSI's PKCS #1. */
@@ -229,7 +229,7 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	/* Clear sensitive information. */
 	R_memset((POINTER)pkcsBlock, 0, sizeof(pkcsBlock));
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Raw RSA public-key operation. Output has same length as modulus.
@@ -273,7 +273,7 @@ R_RSA_PUBLIC_KEY *publicKey;    /* RSA public key */
 	R_memset((POINTER)c, 0, sizeof(c));
 	R_memset((POINTER)m, 0, sizeof(m));
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Raw RSA private-key operation. Output has same length as modulus.
@@ -359,5 +359,5 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	R_memset((POINTER)q, 0, sizeof(q));
 	R_memset((POINTER)qInv, 0, sizeof(qInv));
 	R_memset((POINTER)t, 0, sizeof(t));
-	return(IDOK);
+	return(ID_OK);
 }
