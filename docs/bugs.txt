@@ -1,0 +1,68 @@
+                         RSAEURO Bug Report Form.
+
+                                Version 1.0
+
+This is the RSAEURO Beta testers bug report form, please complete
+this if during your use you encounter a problem.  Once complete
+please either e-mail or post a copy to me.  This can also be used
+for comments and suggestions.
+
+You may also contact me by telephone but only after 7pm weekdays
+or anytime weekends, on +44 (1200) 448241 and ask for Stephen.
+
+Bug Report:
+
+Source File:-
+Details:-
+
+
+
+
+
+
+
+
+
+
+
+
+Comment/Suggestion:
+
+Details:-
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Return to:
+
+     1.   E-mail:   skapp@cix.compulink.co.uk
+
+     2.   S-mail:   Stephen Kapp.
+                    The Post Office,
+                    Dunsop Bridge,
+                    Clitheroe,
+                    Lancashire,
+                    BB7 3BB.
+
+          Please write "RSAEURO BUGS" in top left of envelope.
+
+     3.   Phone:    +44 (1200) 448241
+                    After 7pm Weekdays, Anytime Weekends.

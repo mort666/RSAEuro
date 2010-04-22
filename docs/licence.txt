@@ -1,0 +1,112 @@
+                              RSAEURO - Beta
+                         TOOLKIT LICENSE AGREEMENT
+                             April 22nd, 1995.
+
+                   Copyright (c) J.S.A.Kapp, 1994-1995.
+
+1.   LICENSE. J.S.A.Kapp grants you a nonexclusive, non-transferable,
+     perpetual (subject to the conditions of section 7) license for the
+     "RSAEURO" toolkit (the "Toolkit") and its associated documentation,
+     subject to all of the following terms and conditions:
+
+     i.   To use the Toolkit on any computer in your possession.
+
+     ii.  to make copies of the Toolkit for back-up purposes.
+
+     iii. to modify the Toolkit in any manner for porting or performance
+          improvement purposes (subject to Section 2) or to incorporate the 
+          Toolkit into other computer programs for your own personal or
+          internal use, provided that you provide J.S.A.Kapp with a copy 
+          of any such modification or Application Program by electronic
+          mail, and grant J.S.A.Kapp a perpetual, royalty-free license to
+          use and distribute such modifications and Application Programs on
+          the terms set forth in this Agreement.
+
+     iv.  To copy and distribute the Toolkit and Application Programs in
+          accordance with the limitations set forth in Section 2.
+
+"Application Programs" are programs that incorporate all or any portion of the
+Toolkit in any form. The restrictions imposed on Application Programs in this
+Agreement shall not apply to any software which through the mere aggregation
+on distribution media, is co-located or stored with the Toolkit.
+
+2.   LIMITATIONS ON LICENSE.
+
+     i.   J.S.A.Kapp owns the Toolkit and its associated documentation and
+          all copyrights therein. You may only use, copy, modify and
+          distribute the Toolkit as expressly provided for in this
+          Agreement. You must reproduce and include this Agreement,
+          J.S.A.Kapp's copyright notices and disclaimer of warranty on any
+          copy and its associated documentation.
+
+     ii.  The Toolkit and its associated documentation are freeware for
+          noncommercial purposes, however for commercial purposes please
+          contact J.S.A.Kapp for licensing details.
+
+     iii. The Toolkit and Application Programs are to be used for
+          noncommercial purposes.  However, media costs associated with the
+          distribution of the Program or Application Programs may be
+          recovered.
+
+     iv.  The Toolkit, if modified, must carry prominent notices stating
+          that changes have been made, and the dates of any such changes. 
+
+     v.   Prior permission from J.S.A.Kapp is required for any
+          modifications that access the Toolkit through ways other than the
+          published Toolkit interface or for modifications to the Toolkit
+          interface, and structures. J.S.A.Kapp will grant all reasonable
+          requests for permission to make such modifications.
+
+3.   You are solely responsible for all of your costs and expenses incurred
+     in connection with the distribution of the Toolkit or any Application
+     Program hereunder, and J.S.A.Kapp shall have no liability, obligation
+     or responsibility there of. J.S.A.Kapp shall have no obligation to
+     provide maintenance, support, upgrades or new releases to you or to any
+     distributee of the Toolkit or any Application Program.
+
+4.   THE TOOLKIT AND ITS ASSOCIATED DOCUMENTATION ARE LICENSED "AS IS"
+     WITHOUT WARRANTY AS TO THEIR PERFORMANCE, MERCHANTABILITY OR FITNESS
+     FOR ANY PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE RESULTS AND
+     PERFORMANCE OF THE TOOLKIT IS ASSUMED BY YOU AND YOUR DISTRIBUTEES.
+     SHOULD THE TOOLKIT PROVE DEFECTIVE, YOU AND YOUR DISTRIBUTEES (AND NOT
+     J.S.A.KAPP) ASSUME THE ENTIRE COST OF ALL NECESSARY SERVICING, REPAIR
+     OR CORRECTION.
+
+5.   LIMITATION OF LIABILITY, NEITHER J.S.A.KAPP NOR ANY OTHER PERSON WHO
+     HAS BEEN INVOLVED IN THE CREATION, PRODUCTION, OR DELIVERY OF THE
+     TOOLKIT SHALL BE LIABLE TO YOU OR TO ANY OTHER PERSON FOR ANY DIRECT,
+     INCIDENTAL OR CONSEQUENTIAL DAMAGES, EVEN IF J.S.A.KAPP HAS BEEN
+     ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+6.   RSAEURO is a publication of cryptographic techniques. Applications
+     developed with RSAEURO may be subject to export controls in some
+     countries. If you are located in the United States and develop such
+     applications using RSAEURO, you are advised to obtain a copy of RSAREF
+     from RSADSI, as you may using RSAEURO infringe on Patents held by
+     Public Key Partners of Sunnydale California.
+
+7.   The license granted hereunder is effective until terminated. You may
+     terminate it at anytime by destroying all components of the Toolkit and
+     its associated documentation. The termination of your license will not
+     result in the termination of the licenses of any distributees who have
+     received rights to the Toolkit through you so long as they are in
+     compliance with the provisions of this license.
+
+8.   GENERAL
+
+     i.   Address all correspondence regarding this license to J.S.A.Kapp's
+          electronic mail address <skapp@cix.compulink.co.uk>, or to
+
+          Mr J.S.A.Kapp.
+          The Post Office,
+          Dunsop Bridge,
+          Clitheroe,
+          Lancashire,
+          England.
+          BB7 3BB.
+
+          Tel. (+44) 1200-448241
+
+     ii.  For details of Export Controls and other controls regarding the
+          use of cryptographic techniques please contact your country's
+          relevant authority.

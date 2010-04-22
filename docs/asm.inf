@@ -1,0 +1,29 @@
+Assembler Routines Listing.
+  
+Routines Currently supported in assembler for various processors.
+Sparc assembler routines soon to be supported.
+  
+i386+ routines should work on Intel 386/486 and Pentium
+processors.
+
+M68k routines should work on M680x0 family processors.
+  
+Sparc routines should work on most Sparc processors?
+
+All routines are designed to be assembled using the 'as'
+assembler that comes with the GNU GCC C/C++ complier and with
+most UNIX's.
+  
+i386+          M68k             Sparc
+NN_Digits      NN_Digits        NN_Digits
+NN_Assign      NN_Assign        NN_Assign
+NN_AssignZero  NN_AssignZero    NN_AssignZero
+NN_Add         NN_Add           NN_Add
+NN_Decode      NN_Decode        NN_Decode
+NN_Encode      NN_Encode        NN_Encode
+NN_Cmp         NN_Cmp           NN_Cmp
+NN_Zero        NN_Zero          NN_Zero
+
+R_memcpy       R_memcpy         R_memcpy
+R_memset       R_memset         R_memset
+R_memcmp       R_memcmp         R_memcmp

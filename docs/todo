@@ -1,0 +1,18 @@
+Well Heres the stuff I have to do.
+
+*       Add to the basic RSAEURO toolkit a number of new ciphers.
+        Currently Only DES in various forms is supported, I would
+        like to add RC5, IDEA and maybe others.
+
+*       Improve the Speed of the Hash Functions.
+
+*       Increase the assembler support.
+
+*       User Supplied Key Handling, hash key to common size, etc.
+
+*       Asymmetric Cipher key management.
+
+*       GSS-API
+
+
+

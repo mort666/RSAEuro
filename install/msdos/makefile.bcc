@@ -1,0 +1,94 @@
+# This is a MAKEFILE for Borland C++ Make
+
+# extension for object files
+O = obj
+
+# commands
+CC = bcc
+LIB = tlib
+
+# name of temporary library script
+TEMPFILE = $(TEMP)\temp.mak
+
+# The places to look for include files (in order).
+INCL =  -I. -I$(RSAEURODIR)
+
+# There are no assembler routines for TASM/MASM
+# You do have choice to use ansi or not.
+
+ANSISTD = 0
+
+# Utility routines.
+del = del
+COPY = copy
+
+# Normal C flags.
+# Change -3 to use non 386 instructions.
+#CFLAGS = -3 -ml -f- -O -d $(INCL) -c
+#CFLAGSx = -3 -ml -f- -O -d $(INCL)
+
+# Use ANSI ?
+# Change -3 to use non 386 instructions.
+CFLAGS =  -3 -ml -f- -O -d -DUSE_ANSI=$(ANSISTD) $(INCL) -c
+CFLAGSx = -3 -ml -f- -O -d -DUSE_ANSI=$(ANSISTD) $(INCL)
+
+# The location of the common source directory.
+RSAEURODIR = ..\source\#
+
+RSAEUROLIB = rsaeuro.lib
+
+RSAREFLIB = rsaref.lib
+
+# The location of the demo source directory.
+DEMODIR = ..\demo\#
+
+all : $(RSAEUROLIB) demo 
+
+$(RSAREFLIB) : $(RSAEUROLIB)
+	$(COPY) $(RSAEUROLIB) $(RSAREFLIB)
+
+demo : redemo mdemo randemo
+
+randemo : randemo.$(O) $(RSAEUROLIB)
+		$(CC) $(CFLAGSx) randemo.$(O) $(RSAEUROLIB)
+
+mdemo : mdemo.$(O) $(RSAEUROLIB)
+		$(CC) $(CFLAGSx) mdemo.$(O) $(RSAEUROLIB)
+
+redemo : redemo.$(O) $(RSAEUROLIB)
+		$(CC) $(CFLAGSx) redemo.$(O) $(RSAEUROLIB)
+
+$(RSAEUROLIB) : desc.$(O) shsc.$(O) md2c.$(O) md4c.$(O) md5c.$(O) nn.$(O) prime.$(O)\
+	rsa.$(O) r_encode.$(O) r_dh.$(O) r_enhanc.$(O) r_keygen.$(O) r_random.$(O)\
+	r_stdlib.$(O) rsa.rsp
+	@if NOT EXIST $@ $(LIB) $@
+	@$(LIB) $(RSAEUROLIB) /C /E @rsa.rsp
+
+randemo.$(O) : $(DEMODIR)randemo.c $(RSAEURODIR)global.h $(RSAEURODIR)rsaref.h
+	$(CC) $(CFLAGS) $(DEMODIR)randemo.c
+
+mdemo.$(O) : $(DEMODIR)mdemo.c $(RSAEURODIR)global.h $(RSAEURODIR)rsaref.h
+	$(CC) $(CFLAGS) $(DEMODIR)mdemo.c
+
+redemo.$(O) : $(DEMODIR)redemo.c $(RSAEURODIR)global.h $(RSAEURODIR)rsaref.h
+	$(CC) $(CFLAGS) $(DEMODIR)redemo.c
+
+rsa.rsp :
+	copy &&|
+-+desc.obj &
+-+md2c.obj &   
+-+md4c.obj &
+-+shsc.obj &
+-+md5c.obj &   
+-+nn.obj &
+-+prime.obj &  
+-+rsa.obj &    
+-+r_dh.obj &   
+-+r_encode.obj &
+-+r_enhanc.obj &
+-+r_keygen.obj &
+-+r_random.obj &
+-+r_stdlib.obj
+| rsa.rsp
+	
+!INCLUDE $(RSAEURODIR)targets.mak
