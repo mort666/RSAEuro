@@ -24,8 +24,6 @@
 		0.91 Current revision, code altered to aid speeding up.
 		Used pointer accesses to arrays to speed up some parts,
 		mainly during the loops.
-
-		1.00 23/6/95, Final Release Version
 */
 
 #include "rsaeuro.h"
@@ -299,9 +297,9 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	NN_Decode(n, MAX_NN_DIGITS, privateKey->modulus, MAX_RSA_MODULUS_LEN);
 	NN_Decode(qInv, MAX_NN_DIGITS, privateKey->coefficient, MAX_RSA_PRIME_LEN);
 		/* work out lengths of input components */
-	cDigits = NN_Digits(c, MAX_NN_DIGITS);
 
-	pDigits = NN_Digits(p, MAX_NN_DIGITS);
+    cDigits = NN_Digits(c, MAX_NN_DIGITS);
+    pDigits = NN_Digits(p, MAX_NN_DIGITS);
 	nDigits = NN_Digits(n, MAX_NN_DIGITS);
 
 
@@ -342,7 +340,7 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	NN_Encode (output, *outputLen, t, nDigits);
 
 	/* Clear sensitive information. */
-
+/*
 	R_memset((POINTER)c, 0, sizeof(c));
 	R_memset((POINTER)cP, 0, sizeof(cP));
 	R_memset((POINTER)cQ, 0, sizeof(cQ));
@@ -354,6 +352,6 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	R_memset((POINTER)q, 0, sizeof(q));
 	R_memset((POINTER)qInv, 0, sizeof(qInv));
 	R_memset((POINTER)t, 0, sizeof(t));
-
+*/
 	return(IDOK);
 }

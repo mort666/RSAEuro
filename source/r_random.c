@@ -202,8 +202,8 @@ R_RANDOM_STRUCT *random;
 	MD5_CTX context;
 
 	for(i = 0; i < 16; i++) {
-		random->state[i] ^= clock();
-		random->state[15-i] ^= time(NULL);
+        random->state[i] ^= (char) clock();
+        random->state[15-i] ^= (char) time(NULL);
 	}
 
 	/* Clear any old state with new data */

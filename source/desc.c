@@ -23,18 +23,16 @@
 	All Trademarks Acknowledged.
 
 	Revision history
-		0.90 First revision, this was the original retrofitted D3DES
-		version.
+	0.90 First revision, this was the original retrofitted D3DES
+	version.
 
-		0.91 Second revision, retrofitted new S-box array and new desfunc
-		routine.  Marginally quicker code improves DES throughput.
+	0.91 Second revision, retrofitted new S-box array and new desfunc
+	routine.  Marginally quicker code improves DES throughput.
 
-		0.92 Current revision, added support for 386 assembler desfunc
-		routine, with altered S boxes and key generation to support easier
-		S box look up.  Code that uses 386 desfunc is about 80K per sec
-		faster than RSAREF(tm) code.
-
-		1.00 23/6/95, Final Release Version
+	0.92 Current revision, added support for 386 assembler desfunc
+	routine, with altered S boxes and key generation to support easier
+	S box look up.  Code that uses 386 desfunc is about 80K per sec
+	faster than RSAREF(tm) code.
 */
 
 #include "rsaeuro.h"
@@ -340,9 +338,9 @@ unsigned long Spbox[8][64] = {
 
 #endif
 
-static void unscrunch PROTO_LIST ((unsigned char *, UINT4 *));
-static void scrunch PROTO_LIST ((UINT4 *, unsigned char *));
-static void deskey PROTO_LIST ((UINT4 *, unsigned char *, int));
+void unscrunch PROTO_LIST ((unsigned char *, UINT4 *));
+void scrunch PROTO_LIST ((UINT4 *, unsigned char *));
+void deskey PROTO_LIST ((UINT4 *, unsigned char *, int));
 static void cookey PROTO_LIST ((UINT4 *, UINT4 *, int));
 void desfunc PROTO_LIST ((UINT4 *, UINT4 *));
 
@@ -606,7 +604,7 @@ DES3_CBC_CTX *context;          /* context */
 	*(context->iv+1) = *(context->originalIV+1);
 }
 
-static void scrunch (into, outof)
+void scrunch (into, outof)
 UINT4 *into;
 unsigned char *outof;
 {
@@ -620,7 +618,7 @@ unsigned char *outof;
 	*into   |= (*outof   & 0xffL);
 }
 
-static void unscrunch(into, outof)
+void unscrunch(into, outof)
 unsigned char *into;
 UINT4 *outof;
 {
@@ -636,7 +634,7 @@ UINT4 *outof;
 
 /* Compute DES Subkeys */
 
-static void deskey(subkeys, key, encrypt)
+void deskey(subkeys, key, encrypt)
 UINT4 subkeys[32];
 unsigned char key[8];
 int encrypt;

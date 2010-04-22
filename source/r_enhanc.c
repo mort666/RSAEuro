@@ -30,7 +30,8 @@
 		that same digest used in original signature was used in verify
 		doesn't verify signature if they don't match.
 
-		1.00 23/6/95, Final Release Version
+        1.02 Fourth revision, R_SealUpdate Bug fixed, Bug Reported by
+        Anders Heerfordt <i3683@dc.dk>.
 */
 
 #include "rsaeuro.h"
@@ -56,12 +57,12 @@ static unsigned char DIGEST_INFO_B[] = { 0x05, 0x00, 0x04, 0x10 };
 #define DIGEST_INFO_LEN (DIGEST_INFO_A_LEN + 1 + DIGEST_INFO_B_LEN + 16)
 
 static unsigned char *PADDING[] = {
-	(unsigned char *)"", (unsigned char *)"\x01", (unsigned char *)"\x02\x02",
-	(unsigned char *)"\x03\x03\x03", (unsigned char *)"\x04\x04\x04\x04",
-	(unsigned char *)"\x05\x05\x05\x05\x05",
-	(unsigned char *)"\x06\x06\x06\x06\x06\x06",
-	(unsigned char *)"\x07\x07\x07\x07\x07\x07\x07",
-	(unsigned char *)"\x08\x08\x08\x08\x08\x08\x08\x08"
+    (unsigned char *)"", (unsigned char *)"\01", (unsigned char *)"\02\02",
+    (unsigned char *)"\03\03\03", (unsigned char *)"\04\04\04\04",
+    (unsigned char *)"\05\05\05\05\05",
+    (unsigned char *)"\06\06\06\06\06\06",
+    (unsigned char *)"\07\07\07\07\07\07\07",
+    (unsigned char *)"\08\08\08\08\08\08\08\08"
 };
 
 #define MAX_ENCRYPTED_KEY_LEN MAX_RSA_MODULUS_LEN
@@ -332,9 +333,9 @@ unsigned int partInLen;         /* length of next data part */
 	temp = 8 - context->bufferLen;
 	if(partInLen < temp) {
 						/* Just accumulate into buffer. */
-		context->bufferLen += partInLen;
 		*partOutLen = 0;
 		R_memcpy((POINTER)(context->buffer + context->bufferLen), (POINTER)partIn, partInLen);
+        context->bufferLen += partInLen;    /* Bug Fix - 02/09/95, SK */
 		return(IDOK);
 	}
 

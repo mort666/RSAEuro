@@ -22,8 +22,6 @@
 		0.91 Second revision, this is the current revision, all
 		routines have been altered for speed increases.  Also the
 		addition of assembler equivalents.
-
-		1.00 23/6/95, Final Release Version
 */
 
 #include "rsaeuro.h"
@@ -187,10 +185,6 @@ unsigned int digits;
 
 
 	NN_Assign(a, t, 2 * digits);
-
-	/* Clear sensitive information. */
-
-	R_memset((POINTER)t, 0, sizeof (t));
 }
 
 /* Computes a = b * 2^c (i.e., shifts left c bits), returning carry.
@@ -342,9 +336,6 @@ unsigned int cDigits, dDigits;
 
 	NN_AssignZero (b, dDigits);
 	NN_RShift (b, cc, shift, ddDigits);
-
-	R_memset ((POINTER)cc, 0, sizeof (cc));
-	R_memset ((POINTER)dd, 0, sizeof (dd));
 }
 
 
@@ -357,13 +348,9 @@ void NN_Mod (a, b, bDigits, c, cDigits)
 NN_DIGIT *a, *b, *c;
 unsigned int bDigits, cDigits;
 {
-  NN_DIGIT t[2 * MAX_NN_DIGITS];
+    NN_DIGIT t[2 * MAX_NN_DIGITS];
   
 	NN_Div (t, a, b, bDigits, c, cDigits);
-  
-  /* Zeroize potentially sensitive information.
-	 */
-  R_memset ((POINTER)t, 0, sizeof (t));
 }
 
 /* Computes a = b * c mod d.
@@ -375,14 +362,10 @@ void NN_ModMult (a, b, c, d, digits)
 NN_DIGIT *a, *b, *c, *d;
 unsigned int digits;
 {
-	NN_DIGIT t[2*MAX_NN_DIGITS];
+    NN_DIGIT t[2*MAX_NN_DIGITS];
 
 	NN_Mult (t, b, c, digits);
-  NN_Mod (a, t, 2 * digits, d, digits);
-
-	/* Zeroize potentially sensitive information.
-	 */
-  R_memset ((POINTER)t, 0, sizeof (t));
+    NN_Mod (a, t, 2 * digits, d, digits);
 }
 
 /* Computes a = b^c mod d.
@@ -394,20 +377,20 @@ void NN_ModExp (a, b, c, cDigits, d, dDigits)
 NN_DIGIT *a, *b, *c, *d;
 unsigned int cDigits, dDigits;
 {
-  NN_DIGIT bPower[3][MAX_NN_DIGITS], ci, t[MAX_NN_DIGITS];
-  int i;
+    NN_DIGIT bPower[3][MAX_NN_DIGITS], ci, t[MAX_NN_DIGITS];
+    int i;
 	unsigned int ciBits, j, s;
 
 	/* Store b, b^2 mod d, and b^3 mod d.
 	 */
 	NN_Assign (bPower[0], b, dDigits);
 	NN_ModMult (bPower[1], bPower[0], b, d, dDigits);
-  NN_ModMult (bPower[2], bPower[1], b, d, dDigits);
+    NN_ModMult (bPower[2], bPower[1], b, d, dDigits);
   
-  NN_ASSIGN_DIGIT (t, 1, dDigits);
+    NN_ASSIGN_DIGIT (t, 1, dDigits);
 
 	cDigits = NN_Digits (c, cDigits);
-  for (i = cDigits - 1; i >= 0; i--) {
+    for (i = cDigits - 1; i >= 0; i--) {
 		ci = c[i];
 		ciBits = NN_DIGIT_BITS;
 
@@ -418,24 +401,18 @@ unsigned int cDigits, dDigits;
 				ci <<= 2;
 				ciBits -= 2;
 			}
-    }
+        }
 
-    for (j = 0; j < ciBits; j += 2, ci <<= 2) {
-      /* Compute t = t^4 * b^s mod d, where s = two MSB's of ci.
-			 */
-			NN_ModMult (t, t, t, d, dDigits);
-      NN_ModMult (t, t, t, d, dDigits);
-      if ((s = DIGIT_2MSB (ci)) != 0)
-	NN_ModMult (t, t, bPower[s-1], d, dDigits);
-		}
-  }
+        for (j = 0; j < ciBits; j += 2, ci <<= 2) {
+        /* Compute t = t^4 * b^s mod d, where s = two MSB's of ci. */
+            NN_ModMult (t, t, t, d, dDigits);
+            NN_ModMult (t, t, t, d, dDigits);
+            if ((s = DIGIT_2MSB (ci)) != 0)
+            NN_ModMult (t, t, bPower[s-1], d, dDigits);
+        }
+    }
   
 	NN_Assign (a, t, dDigits);
-  
-	/* Zeroize potentially sensitive information.
-	 */
-	R_memset ((POINTER)bPower, 0, sizeof (bPower));
-	R_memset ((POINTER)t, 0, sizeof (t));
 }
 
 /* Compute a = 1/b mod c, assuming inverse exists.
@@ -447,48 +424,36 @@ void NN_ModInv (a, b, c, digits)
 NN_DIGIT *a, *b, *c;
 unsigned int digits;
 {
-  NN_DIGIT q[MAX_NN_DIGITS], t1[MAX_NN_DIGITS], t3[MAX_NN_DIGITS],
+    NN_DIGIT q[MAX_NN_DIGITS], t1[MAX_NN_DIGITS], t3[MAX_NN_DIGITS],
 		u1[MAX_NN_DIGITS], u3[MAX_NN_DIGITS], v1[MAX_NN_DIGITS],
 		v3[MAX_NN_DIGITS], w[2*MAX_NN_DIGITS];
-  int u1Sign;
+    int u1Sign;
 
-  /* Apply extended Euclidean algorithm, modified to avoid negative
-     numbers.
-   */
-  NN_ASSIGN_DIGIT (u1, 1, digits);
+    /* Apply extended Euclidean algorithm, modified to avoid negative
+       numbers.
+    */
+    NN_ASSIGN_DIGIT (u1, 1, digits);
 	NN_AssignZero (v1, digits);
-  NN_Assign (u3, b, digits);
+    NN_Assign (u3, b, digits);
 	NN_Assign (v3, c, digits);
-  u1Sign = 1;
+    u1Sign = 1;
 
 	while (! NN_Zero (v3, digits)) {
-    NN_Div (q, t3, u3, digits, v3, digits);
-    NN_Mult (w, q, v1, digits);
+        NN_Div (q, t3, u3, digits, v3, digits);
+        NN_Mult (w, q, v1, digits);
 		NN_Add (t1, u1, w, digits);
-    NN_Assign (u1, v1, digits);
+        NN_Assign (u1, v1, digits);
 		NN_Assign (v1, t1, digits);
 		NN_Assign (u3, v3, digits);
 		NN_Assign (v3, t3, digits);
 		u1Sign = -u1Sign;
 	}
 
-	/* Negate result if sign is negative.
-		*/
+    /* Negate result if sign is negative. */
 	if (u1Sign < 0)
 		NN_Sub (a, c, u1, digits);
 	else
 		NN_Assign (a, u1, digits);
-
-	/* Zeroize potentially sensitive information.
-	 */
-	R_memset ((POINTER)q, 0, sizeof (q));
-	R_memset ((POINTER)t1, 0, sizeof (t1));
-	R_memset ((POINTER)t3, 0, sizeof (t3));
-	R_memset ((POINTER)u1, 0, sizeof (u1));
-	R_memset ((POINTER)u3, 0, sizeof (u3));
-	R_memset ((POINTER)v1, 0, sizeof (v1));
-	R_memset ((POINTER)v3, 0, sizeof (v3));
-	R_memset ((POINTER)w, 0, sizeof (w));
 }
 
 /* Computes a = gcd(b, c).
@@ -518,10 +483,6 @@ unsigned int digits;
 	}
 
 	NN_Assign(a , g(iminus1), digits);
-
-	/* Clear sensitive information. */
-
-	R_memset((POINTER)t, 0, sizeof(t));
 }
 
 /* Returns the significant length of a in bits.
@@ -699,7 +660,7 @@ NN_DIGIT         *low;
 	m = m1 + m2;
 
 	if(m < m1)
-		carry = 1 << (NN_DIGIT_BITS / 2);
+        carry = 1L << (NN_DIGIT_BITS / 2);
 
 	ml = (m & MAX_NN_HALF_DIGIT) << (NN_DIGIT_BITS / 2);
 	mh = m >> (NN_DIGIT_BITS / 2);

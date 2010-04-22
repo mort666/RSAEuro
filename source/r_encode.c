@@ -23,10 +23,11 @@
 
 		0.91 Initial revision using current system.
 
-		0.92 Current revision, fixed minor bugs in rev. 0.91
+        0.92 Third revision, fixed minor bugs in rev. 0.91
 		and better comments updated, plus code layout.
 
-		1.00 23/6/95, Final Release Version
+        1.02 Fourth revision, fixed bug in R_EncodePEMBlock
+        reported by Wang Wei Jun <wangw@iti.gov.sg>.
 */
 
 #include "rsaeuro.h"
@@ -113,9 +114,10 @@ unsigned int blockLen;          /* length of block */
 
 	*encodedBlockLen = 0;
 
-	for (i = 0; i < blockLen; i += 3) {
-		encode(&encodedBlock[4*i], &block[3*i], (lastLen >= 3 ? 3 : lastLen));
-		lastLen = blockLen - (i+1);
+        /* Bug Fixed By SK 02/09/95 */
+    for (i = 0, lastLen = blockLen; i < blockLen; i += 3) {
+        encode(&encodedBlock[4*i/3], &block[i], (lastLen >= 3 ? 3 : lastLen));
+        lastLen -= 3;
 		*encodedBlockLen += 4;
 	}
 

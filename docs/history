@@ -26,7 +26,11 @@ Revision History of RSAEURO
         Random Objects code for R_RandomCreate and R_RandomMix
         modified.
 
+1.02 -  October 1995.
+        Fixed a number of minor bugs and fixed problem with Math
+        library caused it not to work that well with 16-bit
+        compilers.
 
 ----
-J.S.Kapp - Sun 06/08/95 12:16:44
+J.S.Kapp - Sun  08/10/95 15:51:35
 

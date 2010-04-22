@@ -67,9 +67,9 @@ extern "C" {
 #define MIN_RSA_MODULUS_BITS 508
 /* 
 	 PGP 2.6.2 Now allows 2048-bit keys changing below will allow this.
-   It does lengthen key generation slightly if the value is increased. 
+     It does lengthen key generation slightly if the value is increased.
 */
-#define MAX_RSA_MODULUS_BITS 2048
+#define MAX_RSA_MODULUS_BITS 1024
 #define MAX_RSA_MODULUS_LEN ((MAX_RSA_MODULUS_BITS + 7) / 8)
 #define MAX_RSA_PRIME_BITS ((MAX_RSA_MODULUS_BITS + 1) / 2)
 #define MAX_RSA_PRIME_LEN ((MAX_RSA_PRIME_BITS + 7) / 8)
@@ -116,7 +116,7 @@ extern "C" {
 /* Library details. */
 
 #define RSAEURO_VER_MAJ 1
-#define RSAEURO_VER_MIN 00
+#define RSAEURO_VER_MIN 02
 #define RSAEURO_IDENT "RSAEURO"
 #define RSAEURO_DATE "21/08/94"
 
@@ -133,44 +133,44 @@ extern "C" {
 /* Random structure. */
 
 typedef struct {
-	unsigned int bytesNeeded;                    /* seed bytes required */
+  unsigned int bytesNeeded;                    /* seed bytes required */
   unsigned char state[16];                     /* state of object */
-	unsigned int outputAvailable;                /* number byte available */
+  unsigned int outputAvailable;                /* number byte available */
   unsigned char output[16];                    /* output bytes */
 } R_RANDOM_STRUCT;
 
 /* RSA public and private key. */
 
 typedef struct {
-  unsigned int bits;                           /* length in bits of modulus */
+  unsigned short int bits;                     /* length in bits of modulus */
   unsigned char modulus[MAX_RSA_MODULUS_LEN];  /* modulus */
   unsigned char exponent[MAX_RSA_MODULUS_LEN]; /* public exponent */
 } R_RSA_PUBLIC_KEY;
 
 typedef struct {
-  unsigned int bits;                           /* length in bits of modulus */
-	unsigned char modulus[MAX_RSA_MODULUS_LEN];  /* modulus */
-	unsigned char publicExponent[MAX_RSA_MODULUS_LEN];     /* public exponent */
+  unsigned short int bits;                     /* length in bits of modulus */
+  unsigned char modulus[MAX_RSA_MODULUS_LEN];  /* modulus */
+  unsigned char publicExponent[MAX_RSA_MODULUS_LEN];     /* public exponent */
   unsigned char exponent[MAX_RSA_MODULUS_LEN]; /* private exponent */
-	unsigned char prime[2][MAX_RSA_PRIME_LEN];   /* prime factors */
+  unsigned char prime[2][MAX_RSA_PRIME_LEN];   /* prime factors */
   unsigned char primeExponent[2][MAX_RSA_PRIME_LEN];     /* exponents for CRT */
-	unsigned char coefficient[MAX_RSA_PRIME_LEN];          /* CRT coefficient */
+  unsigned char coefficient[MAX_RSA_PRIME_LEN];          /* CRT coefficient */
 } R_RSA_PRIVATE_KEY;
 
 /* RSA prototype key. */
 
 typedef struct {
-	unsigned int bits;                           /* length in bits of modulus */
-	int useFermat4;                              /* public exponent (1 = F4, 0 = 3) */
+  unsigned int bits;                           /* length in bits of modulus */
+  int useFermat4;                              /* public exponent (1 = F4, 0 = 3) */
 } R_RSA_PROTO_KEY;
 
 /* Diffie-Hellman parameters. */
 
 typedef struct {
-	unsigned char *prime;                        /* prime */
-	unsigned int primeLen;                       /* length of prime */
+  unsigned char *prime;                        /* prime */
+  unsigned int primeLen;                       /* length of prime */
   unsigned char *generator;                    /* generator */
-	unsigned int generatorLen;                   /* length of generator */
+  unsigned int generatorLen;                   /* length of generator */
 } R_DH_PARAMS;
 
 /* digest algorithm context */
@@ -194,14 +194,14 @@ typedef struct {
 /* envelope context */
 
 typedef struct {
-	int encryptionAlgorithm;                       /* encryption type */
-	union {                                      /* encryption sub-context */
+  int encryptionAlgorithm;                       /* encryption type */
+  union {                                      /* encryption sub-context */
 		DES_CBC_CTX des;
 		DES3_CBC_CTX des3;
 		DESX_CBC_CTX desx;
   } cipherContext;
 
-	unsigned char buffer[8];                       /* data buffer */
+  unsigned char buffer[8];                       /* data buffer */
   unsigned int bufferLen;                      /* buffer length */
 } R_ENVELOPE_CTX;
 
