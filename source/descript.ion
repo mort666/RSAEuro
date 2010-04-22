@@ -18,8 +18,6 @@ rsaref.h * - RSAREF Patch Header File
 r_random.h * - Random Numbers Header File
 r_encode.c * - RFC1113 Encoding
 r_enhanc.c * - Crypto Enhancements
-r_keygen.c * - Key Generation
-r_random.c * - Random Numbers
 r_stdlib.c * - Std Library
 shs.h * - SHS Header File
 shsc.c * - SHS Hash code
@@ -28,3 +26,5 @@ global.h * - Global Header File
 md2c.c * - MD2 Message Digest
 rsa68k.s * - M680x0 ASM (gcc)
 rsasparc.s * - Sparc ASM Routines (gcc)
+r_keygen.c * - Key Generation
+r_random.c * - Random Numbers

@@ -14,7 +14,8 @@
 	NOT be imported to the US and used there.
 
 	Random Objects routines, based heavily on RSAREF(tm) random objects
-	code.
+	code.  New routines REQUIRE and ANSI Standard C compiler that has
+	clock() and time() functions.
 
 	All Trademarks Acknowledged.
 
@@ -28,7 +29,11 @@
 		Compiler must has ANSI standard time routines for new routines
 		to operate fully.
 
-		1.00 23/6/95, Final Release Version
+		1.01 Modifications to R_RandomCreate and R_RandomMix to
+		introduce better random number creation system.  The old
+		R_RandomMix had a minor flaw as it didn't flush the old output
+		from the object, second added that little extra to the seed
+		for R_RandomCreate.
 */
 
 #include <stdlib.h>
@@ -42,6 +47,7 @@
 #include "r_random.h"
 
 #define RANDOM_BYTES_RQ 256
+	/* We use more seed data for an internally created object */
 #define RANDOM_BYTES_RQINT 512
 
 #define MIX_CNT 16
@@ -168,30 +174,48 @@ R_RANDOM_STRUCT *random;                                /* random structure */
 	random->outputAvailable = 0;
 	random->bytesNeeded = RANDOM_BYTES_RQINT;  /* using internal value */
 
-	t = time(NULL);                 /* use for seed data */
-	gmt = gmtime(&t);
+		/* Add data to random object */
+	while(random->bytesNeeded) {
+		t = time(NULL);                 /* use for seed data */
+		gmt = gmtime(&t);
+		cnow = clock();
 
-	while(random->bytesNeeded)
 		R_RandomUpdate(random, (POINTER)gmt, sizeof(struct tm));
+		R_RandomUpdate(random, &cnow, sizeof(clock_t));
+	}
 
+	/* Clean Up time data */
 	R_memset((POINTER)gmt, 0, sizeof(struct tm));
+	cnow = 0;
 	t = 0;
 }
 
 /* Mix up state of the current random structure.
 	 Again requires both clock functions this just adds something
-	 extra to the state.
+	 extra to the state, then refreshes the output.
 */
 
 void R_RandomMix(random)
 R_RANDOM_STRUCT *random;
 {
 	unsigned int i;
+	MD5_CTX context;
 
 	for(i = 0; i < 16; i++) {
 		random->state[i] ^= clock();
 		random->state[15-i] ^= time(NULL);
 	}
+
+	/* Clear any old state with new data */
+
+	MD5Init(&context);
+	MD5Update(&context, random->state, 16);
+	MD5Final(random->output, &context);
+
+	/* tell R_GenerateBytes there is new output */
+
+	random->outputAvailable = 16;
+
 }
 
 

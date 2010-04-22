@@ -13,8 +13,6 @@
 	This library is legal everywhere outside the US.  And should
 	NOT be imported to the US and used there.
 
-	All Trademarks Acknowledged.
-
 	This header file contains prototypes, and other definitions used
 	in and by RSAEURO.
 
@@ -31,8 +29,6 @@
 
 	0.93 Fourth revision, Library details section added, MD4 details
 	added to header file, digest contexts altered.
-
-	1.00 23/6/95, Final Release Version
 */
 
 #ifndef _RSAEURO_H_
@@ -70,7 +66,7 @@ extern "C" {
 
 #define MIN_RSA_MODULUS_BITS 508
 /* 
-   PGP 2.6.2 Now allows 2048-bit keys changing below will allow this. 
+	 PGP 2.6.2 Now allows 2048-bit keys changing below will allow this.
    It does lengthen key generation slightly if the value is increased. 
 */
 #define MAX_RSA_MODULUS_BITS 2048
@@ -119,9 +115,9 @@ extern "C" {
 
 /* Library details. */
 
-#define RSAEURO_VER_MAJ 0
-#define RSAEURO_VER_MIN 93
-#define RSAEURO_IDENT "RSAEURO Beta Release"
+#define RSAEURO_VER_MAJ 1
+#define RSAEURO_VER_MIN 00
+#define RSAEURO_IDENT "RSAEURO"
 #define RSAEURO_DATE "21/08/94"
 
 /* Internal Error Codes */
@@ -153,8 +149,8 @@ typedef struct {
 
 typedef struct {
   unsigned int bits;                           /* length in bits of modulus */
-  unsigned char modulus[MAX_RSA_MODULUS_LEN];  /* modulus */
-  unsigned char publicExponent[MAX_RSA_MODULUS_LEN];     /* public exponent */
+	unsigned char modulus[MAX_RSA_MODULUS_LEN];  /* modulus */
+	unsigned char publicExponent[MAX_RSA_MODULUS_LEN];     /* public exponent */
   unsigned char exponent[MAX_RSA_MODULUS_LEN]; /* private exponent */
 	unsigned char prime[2][MAX_RSA_PRIME_LEN];   /* prime factors */
   unsigned char primeExponent[2][MAX_RSA_PRIME_LEN];     /* exponents for CRT */

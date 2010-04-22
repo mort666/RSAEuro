@@ -21,8 +21,6 @@
 
 		0.91 Second revision, minor modifications to RSAFilter routine
 		and method.  Result minor speed increase.
-
-		1.00 23/6/95, Final Release Version
 */
 
 #include "rsaeuro.h"
@@ -167,4 +165,3 @@ unsigned int aDigits, bDigits;
 
 	return(status);
 }
-

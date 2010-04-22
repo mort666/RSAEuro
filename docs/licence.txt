@@ -1,6 +1,6 @@
-                              RSAEURO - Beta
+                                  RSAEURO
                          TOOLKIT LICENSE AGREEMENT
-                             April 22nd, 1995.
+                             June 23rd, 1995.
 
                    Copyright (c) J.S.A.Kapp, 1994-1995.
 
@@ -95,7 +95,7 @@ on distribution media, is co-located or stored with the Toolkit.
 8.   GENERAL
 
      i.   Address all correspondence regarding this license to J.S.A.Kapp's
-          electronic mail address <skapp@cix.compulink.co.uk>, or to
+          electronic mail address <rsaeuro@sourcery.demon.co.uk>, or to
 
           Mr J.S.A.Kapp.
           The Post Office,

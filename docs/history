@@ -1,0 +1,32 @@
+Revision History of RSAEURO
+
+0.90 -  July 1994.
+        First Alpha Versions, most functions implemented.
+
+0.91 -  Sept. 1994.
+        Bulk of Code complete, Math functions partly complete.
+
+0.92 -  Oct. 1994.
+        Some assembler support added for Intel x86 processors.
+        Math routines problems on PC and Sun SPARC.
+        
+0.93 -  Feb. 1995.
+        Math routines complete, 680x0 assembler support added.
+        In house testing started.
+
+0.93 -  April 1995.
+        Goes to Beta..
+
+1.00 -  June 1995.
+        Fixed Documentation and produced distribution for release.
+        RSAEURO Released.
+
+1.01 -  August 1995.
+        Documentation updated with new rsaeuro e-mail addresses.
+        Random Objects code for R_RandomCreate and R_RandomMix
+        modified.
+
+
+----
+J.S.Kapp - Sun 06/08/95 12:16:44
+
