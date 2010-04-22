@@ -80,7 +80,7 @@ R_RANDOM_STRUCT *randomStruct;             /* random structure */
 	NN_Encode(params->prime, params->primeLen, p, pDigits);
 	NN_Encode(params->generator, params->generatorLen, g, pDigits);
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Setup Diffie-Hellman key agreement. Public value has same length
@@ -122,7 +122,7 @@ R_RANDOM_STRUCT *randomStruct;                          /* random structure */
 
 	R_memset((POINTER)x, 0, sizeof(x));
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Computes agreed key from the other party's public value, a private
@@ -163,5 +163,5 @@ R_DH_PARAMS *params;                           /* Diffie-Hellman parameters */
 	R_memset((POINTER)x, 0, sizeof(x));
 	R_memset((POINTER)z, 0, sizeof(z));
 
-	return(IDOK);
+	return(ID_OK);
 }

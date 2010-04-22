@@ -34,6 +34,9 @@
 		R_RandomMix had a minor flaw as it didn't flush the old output
 		from the object, second added that little extra to the seed
 		for R_RandomCreate.
+
+        1.04 Modified R_RandomCreate to include seeding data generated
+        using the special routine subrand().
 */
 
 #include <stdlib.h>
@@ -47,10 +50,13 @@
 #include "r_random.h"
 
 #define RANDOM_BYTES_RQ 256
+
 	/* We use more seed data for an internally created object */
 #define RANDOM_BYTES_RQINT 512
 
 #define MIX_CNT 16
+
+static UINT4 subrand PROTO_LIST((long));
 
 /* Set up, random object ready for seeding. */
 
@@ -62,7 +68,7 @@ R_RANDOM_STRUCT *random;        /* new random structure */
 	random->outputAvailable = 0;
 	random->bytesNeeded = RANDOM_BYTES_RQ;
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 
@@ -74,7 +80,7 @@ unsigned int len;               /* length of block */
 {
 	MD5_CTX context;
 	BYTE digest[16];
-	unsigned int i, j;
+    unsigned short int i, j;
 
 	MD5Init(&context);
 	MD5Update(&context, block, len);
@@ -98,7 +104,7 @@ unsigned int len;               /* length of block */
 	R_memset((POINTER)digest, 0, sizeof (digest));
 	j = 0;
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Get the number of seed byte still required by the object */
@@ -109,7 +115,7 @@ R_RANDOM_STRUCT *random;        /* random structure */
 {
 	*bytesNeeded = random->bytesNeeded;
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 int R_GenerateBytes(block, len, random)
@@ -146,7 +152,7 @@ R_RANDOM_STRUCT *random;                          /* random structure */
 	R_memcpy((POINTER)block, (POINTER)&random->output[16-avail], len);
 	random->outputAvailable = avail - len;
 
-	return(IDOK);
+	return(ID_OK);
 }
 
 /* Clear Random object when finished. */
@@ -157,17 +163,17 @@ R_RANDOM_STRUCT *random;        /* random structure */
 	R_memset((POINTER)random, 0, sizeof(R_RANDOM_STRUCT));
 }
 
-/* Create Random object, seed ready for use.
-	 Requires ANSI Standard time routines to provide seed data.
+/*  Create Random object, seed ready for use.
+    Requires ANSI Standard time routines to provide seed data.
 */
 
 void R_RandomCreate(random)
 R_RANDOM_STRUCT *random;                                /* random structure */
 {
-	unsigned int bytes;
 	clock_t cnow;
 	time_t t;
 	struct tm *gmt;
+    UINT4 temp;
 
 			/* clear and setup object for seeding */
 	R_memset((POINTER)random->state, 0, sizeof(random->state));
@@ -179,20 +185,23 @@ R_RANDOM_STRUCT *random;                                /* random structure */
 		t = time(NULL);                 /* use for seed data */
 		gmt = gmtime(&t);
 		cnow = clock();
+        temp = subrand(t);              /* use special routine to produce seed */
 
+        R_RandomUpdate(random, (POINTER)&temp, sizeof(UINT4));
 		R_RandomUpdate(random, (POINTER)gmt, sizeof(struct tm));
         R_RandomUpdate(random, (POINTER)&cnow, sizeof(clock_t));
 	}
 
-	/* Clean Up time data */
+    /* Clean Up time related data */
 	R_memset((POINTER)gmt, 0, sizeof(struct tm));
 	cnow = 0;
 	t = 0;
+    temp = 0;
 }
 
-/* Mix up state of the current random structure.
-	 Again requires both clock functions this just adds something
-	 extra to the state, then refreshes the output.
+/*  Mix up state of the current random structure.
+    Again requires both clock functions this just adds something
+    extra to the state, then refreshes the output.
 */
 
 void R_RandomMix(random)
@@ -201,7 +210,7 @@ R_RANDOM_STRUCT *random;
 	unsigned int i;
 	MD5_CTX context;
 
-	for(i = 0; i < 16; i++) {
+    for(i = 0; i < MIX_CNT; i++) {
         random->state[i] ^= (unsigned char) clock();
         random->state[15-i] ^= (unsigned char) time(NULL);
 	}
@@ -218,5 +227,38 @@ R_RANDOM_STRUCT *random;
 
 }
 
+/*
+    This routine is based on an idea outlined in the book "Numerical Recipes
+    in C" using a form of reduced DES like function.
+*/
 
+#define NITER 4
+
+static UINT4 subrand(long idum) {
+
+    UINT4 irword, lword;
+    static long idums = 0.0;
+    UINT4 i, ia, ib, iswap, itmph=0, itmpl=0;
+
+    static UINT4 c1[NITER] = { 0xbaa96887L, 0x1e17d32cL, 0x03dcbc3cL, 0xf033d1b2L };
+    static UINT4 c2[NITER] = { 0x4bf03b58L, 0xe8740fc3L, 0x69aac5a6L, 0x55a7ca46L };
+
+    if (idum < 0) {
+        idums = -(idum);
+        idum = 1;
+    }
+
+    irword = idum;
+    lword = idums;
+
+    for(i=0; i < NITER; i++) {
+        ia=(iswap=irword) ^ c1[i];
+        itmpl = ia & 0xffff;
+        itmph = ia >> 16;
+        ib = itmpl*itmpl+~(itmph*itmph);
+        irword=lword ^ (((ia = (ib >> 16) | ((ib & 0xffff) << 16)) ^ c2[i])+itmpl*itmph);
+        lword=iswap;
+    }
+    return irword;
+}
 
