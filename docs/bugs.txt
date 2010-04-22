@@ -1,8 +1,8 @@
-                         RSAEuro Bug Report Form.
+                         RSAEURO Bug Report Form.
 
                                 Version 1.0
 
-This is the RSAEuro report form, please complete this if during
+This is the RSAEURO report form, please complete this if during
 your use you encounter a problem.  Once complete please either
 e-mail or post a copy to me.  This can also be used for comments
 and suggestions.
@@ -62,8 +62,7 @@ Details:-
                     Lancashire,
                     BB7 3BB.
 
-          Please write "RSAEuro BUGS" in top left of envelope.
+          Please write "RSAEURO BUGS" in top left of envelope.
 
      3.   Phone:    +44 (468) 286034  Daytime during weekdays.
                     +44 (1200) 448241 After 7pm Weekdays, Anytime Weekends.
-

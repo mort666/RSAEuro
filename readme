@@ -1,4 +1,4 @@
-RSAEURO Version 1.04 Internet Release Distribution
+RSAEURO Version 1.03 Distribution
 
 In this distribution the various files are included in the directories
 below.
@@ -9,10 +9,10 @@ SOURCE  - Source Code Directory
 SCRIPTS - Demo  Applications Script Files
 INSTALL - Installation Instructions
 
-The documentation is supplied in Postscript, Word 6 and ASCII formats.
+The documentation is supplied in both Postscript and ASCII formats.
+(At the moment due a problem with Windows Word The main docs are only
+availible as Postscript.)
 
 Please report any problems with the code or documentation to me on
 the bug report form.  Also any problems you may have in using the
 toolkit.  Please read the bug report form for more details.
-
-Thanks.

@@ -31,16 +31,6 @@ Revision History of RSAEURO
         library caused it not to work that well with 16-bit
         compilers.
 
-1.03 -  April 1996.
-        Some minor bug fixes that thought should be released plus
-        minor additions to random number code.
-
-1.04 -  October 1996.
-        Minor/Major bug fixes, plus addition of new routine
-        R_RSAEuroInfo also to more modifications to random number
-        routines.
-
-
 ----
-J.S.Kapp - Sun  13/10/96 01:03:13
+J.S.Kapp - Sun  08/10/95 15:51:35
 

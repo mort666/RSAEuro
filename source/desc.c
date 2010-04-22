@@ -417,7 +417,7 @@ unsigned int len;                                                               
 	R_memset((POINTER)inputBlock, 0, sizeof(inputBlock));
 	R_memset((POINTER)work, 0, sizeof(work));
 
-	return(ID_OK);
+	return(IDOK);
 }
 
 void DES_CBCRestart(context)
@@ -509,7 +509,7 @@ unsigned int len;               /* length of input and output blocks */
 	R_memset((POINTER)inputBlock, 0, sizeof(inputBlock));
 	R_memset((POINTER)work, 0, sizeof(work));
 
-	return(ID_OK);
+	return(IDOK);
 }
 
 void DESX_CBCRestart(context)

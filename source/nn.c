@@ -27,9 +27,6 @@
         dmult bug fix, Bug reported by Anders Heerfordt <i3683@dc.dk>.
 
         1.03 Fourth revision, SunCompiler patch
-
-        1.04 Fifth revision, Fix to fix problem with NN_Encode
-        and NN_Decode when running with MS Visual C++ 4.x.
 */
 
 #include "rsaeuro.h"
@@ -58,10 +55,8 @@ unsigned char *b;
 unsigned int digits, len;
 {
   NN_DIGIT t;
-  unsigned int i, u;
-  int j;
+  unsigned int i, j, u;
   
-            /* @##$ unsigned/signed bug fix added JSAK - Fri  31/05/96 18:09:11 */
   for (i = 0, j = len - 1; i < digits && j >= 0; i++) {
     t = 0;
     for (u = 0; j >= 0 && u < NN_DIGIT_BITS; j--, u += 8)
@@ -86,17 +81,15 @@ unsigned char *a;
 unsigned int digits, len;
 {
 	NN_DIGIT t;
-    unsigned int i, u;
-    int j;
+    unsigned int i, j, u;
 
-            /* @##$ unsigned/signed bug fix added JSAK - Fri  31/05/96 18:09:11 */
-    for (i = 0, j = len - 1; i < digits && j >= 0; i++) {
+	for (i = 0, j = len - 1; i < digits && j >= 0; i++) {
 		t = b[i];
-        for (u = 0; j >= 0 && u < NN_DIGIT_BITS; j--, u += 8)
+		for (u = 0; j >= 0 && u < NN_DIGIT_BITS; j--, u += 8)
 			a[j] = (unsigned char)(t >> u);
 	}
 
-    for (; j >= 0; j--)
+	for (; j >= 0; j--)
 		a[j] = 0;
 }
 
