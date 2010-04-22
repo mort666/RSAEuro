@@ -1,7 +1,7 @@
 /*
 	SHSC.C - Secure Hash Standard Code
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -19,7 +19,8 @@
 		0.90 first revision, initial implementation of the secure
 		hash standard FIPS PUB 180.
 
-		1.00 23/6/95, Final Release Version
+        1.03 second revision, SHSFinal modified to output to a char
+        array specified by the user.
 */
 
 
@@ -31,22 +32,22 @@
 #define K1  0x5A827999L 	/* Rounds  0-19 */
 #define K2  0x6ED9EBA1L 	/* Rounds 20-39 */
 #define K3  0x8F1BBCDCL 	/* Rounds 40-59 */
-#define K4  0xCA62C1D6L 	/* Rounds 60-79 */
+#define K4  0xCA62C1D6L     /* Rounds 60-79 */
 
 /* SHS initial values */
 
 #define Ainit 0x67452301L
 #define Binit 0xEFCDAB89L
-#define Cinit	0x98BADCFEL
-#define Dinit	0x10325476L
-#define Einit	0xC3D2E1F0L
+#define Cinit 0x98BADCFEL
+#define Dinit 0x10325476L
+#define Einit 0xC3D2E1F0L
 
 /* The SHS f()-functions */
 
-#define f1(x,y,z)   (( x & y ) | ( ~x & z ))		          /* Rounds  0-19 */
+#define f1(x,y,z)   (( x & y ) | ( ~x & z ))              /* Rounds  0-19 */
 #define f2(x,y,z)   ( x ^ y ^ z )                         /* Rounds 20-39 */
 #define f3(x,y,z)   (( x & y ) | ( x & z ) | ( y & z ))   /* Rounds 40-59 */
-#define f4(x,y,z)   ( x ^ y ^ z )			                    /* Rounds 60-79 */
+#define f4(x,y,z)   ( x ^ y ^ z )                         /* Rounds 60-79 */
 
 /* 32-bit rotate - kludged with shifts */
 
@@ -105,6 +106,7 @@ UINT4 A, B, C, D, E;
 
 static void byteReverse PROTO_LIST ((UINT4 *, int ));
 static void SHSTransform PROTO_LIST ((SHS_CTX *));
+static void Encode PROTO_LIST((unsigned char *, UINT4 *, unsigned int));
 
 /* Initialize the SHS values */
 
@@ -124,8 +126,8 @@ SHS_CTX *context;               /* context */
 
 /* Update SHS for a block of data.
 
-	 This code assumes that the buffer size is a multiple of
-	 SHS_BLOCKSIZE bytes long.
+   This code assumes that the buffer size is a multiple of
+   SHS_BLOCKSIZE bytes long.
 */
 
 void SHSUpdate(context, buffer, count)
@@ -153,11 +155,12 @@ int count;                      /* length of input block */
 	R_memcpy((POINTER)context->data, buffer, count);
 }
 
-/* Finalize SHS hash, doesn't output a char value as yet.
-	 That is on the todo list.
+/* Finalize SHS hash, outputs to a unsigned char array.
+   array must be > 20 bytes in length.
 */
 
-void SHSFinal(context)
+void SHSFinal(digest, context)
+BYTE *digest;
 SHS_CTX *context;               /* context */
 {
 	int count;
@@ -190,6 +193,10 @@ SHS_CTX *context;               /* context */
 
 	SHSTransform(context);
 	byteReverse(context->data, SHS_DIGESTSIZE);
+
+    Encode(digest, context->digest, 20);
+
+    R_memset((POINTER)context, 0, sizeof(SHS_CTX));
 }
 
 static void byteReverse(buffer, byteCount)
@@ -281,6 +288,24 @@ SHS_CTX *context;
 	context->digest[3] += D;
 	context->digest[4] += E;
 
+    /* Clear sensitive information */
+
 	R_memset((POINTER) W, 0, sizeof(W));
 }
 
+/* Encode SHS output in char array */
+
+static void Encode(output, input, len)
+unsigned char *output;
+UINT4 *input;
+unsigned int len;
+{
+	unsigned int i, j;
+
+	for(i = 0, j = 0; j < len; i++, j += 4) {
+        output[j+3] = (unsigned char)(input[i] & 0xff);
+        output[j+2] = (unsigned char)((input[i] >> 8) & 0xff);
+        output[j+1] = (unsigned char)((input[i] >> 16) & 0xff);
+        output[j] = (unsigned char)((input[i] >> 24) & 0xff);
+	}
+}

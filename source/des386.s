@@ -1,7 +1,7 @@
 /*
 	DES386.S - Data Encryption Standard routines for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+        Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -26,8 +26,6 @@
 
 		0.91 Current revision some minor bug fixes to original
 		code.  Comments revised to reflect original C code.
-
-		1.00 23/6/95, Final Release Version
 */
 
 	/* Crafty DES Function */

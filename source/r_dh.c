@@ -2,7 +2,7 @@
 
 	R_DH.C - Diffie-Hellman routines for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -23,7 +23,6 @@
 		Diffie-Hellman key agreement stuff, based heavily on
 		RSAREF(tm) and relies heavily on the NN.C routines.
 
-		1.00 23/6/95, Final Release Version
 */
 
 #include "rsaeuro.h"

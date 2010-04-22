@@ -1,8 +1,8 @@
-                                  RSAEURO
-                         TOOLKIT LICENSE AGREEMENT
-                             June 23rd, 1995.
+                             RSAEURO
+                    TOOLKIT LICENSE AGREEMENT
+                         17th April 1996.
 
-                   Copyright (c) J.S.A.Kapp, 1994-1995.
+               Copyright (c) J.S.A.Kapp, 1994-1996.
 
 1.   LICENSE. J.S.A.Kapp grants you a nonexclusive, non-transferable,
      perpetual (subject to the conditions of section 7) license for the
@@ -82,8 +82,8 @@ on distribution media, is co-located or stored with the Toolkit.
      developed with RSAEURO may be subject to export controls in some
      countries. If you are located in the United States and develop such
      applications using RSAEURO, you are advised to obtain a copy of RSAREF
-     from RSADSI, as you may using RSAEURO infringe on Patents held by
-     Public Key Partners of Sunnydale California.
+     from RSADSI, as you may using RSAEURO infringe on Patents held by RSA
+     Data Security and Cylink.
 
 7.   The license granted hereunder is effective until terminated. You may
      terminate it at anytime by destroying all components of the Toolkit and
@@ -106,6 +106,7 @@ on distribution media, is co-located or stored with the Toolkit.
           BB7 3BB.
 
           Tel. (+44) 1200-448241
+          Tel. (+44) 468-286034
 
      ii.  For details of Export Controls and other controls regarding the
           use of cryptographic techniques please contact your country's

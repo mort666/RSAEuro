@@ -1,7 +1,7 @@
 /*
 	RSASPARC.S - processor-specific C library routines for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+        Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF 2.0.
 
@@ -30,7 +30,7 @@
 			_NN_Encode, _NN_AssignZero,
 			_NN_Zero, _NN_Cmp.
 
-		1.00 23/6/95, Final Release Version
+
 */
 	/* Math Routines */
 

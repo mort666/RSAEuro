@@ -1,7 +1,7 @@
 /*
 	R_STDLIB.C - platform-specific C library routines for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -26,15 +26,13 @@
 
 		0.92 Current revision, modified to allow use of assembler
 		versions or the ANSI standard equivalent versions.
-
-		1.00 23/6/95, Final Release Version
 */
 
 #include "rsaeuro.h"
 
 /* Library Copyright Message */
 
-BYTE *Copyright[] = { "Copyright (c) J.S.A.Kapp 1994." };
+BYTE *Copyright[] = { "Copyright (c) J.S.A.Kapp 94-96." };
 
 #ifndef USE_ANSI
 /* Secure memset routine */

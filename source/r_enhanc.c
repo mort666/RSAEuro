@@ -1,7 +1,7 @@
 /*
 	R_ENHANC.C - cryptographic enhancements for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -31,7 +31,8 @@
 		doesn't verify signature if they don't match.
 
         1.02 Fourth revision, R_SealUpdate Bug fixed, Bug Reported by
-        Anders Heerfordt <i3683@dc.dk>.
+        Anders Heerfordt <i3683@dc.dk>.  PADDING problem array incorrectly
+        setup, reported by Anders Heerfordt <i3683@dc.dk>.
 */
 
 #include "rsaeuro.h"
@@ -144,7 +145,7 @@ unsigned int *digestLen;        /* length of message digest */
 
 	switch(context->digestAlgorithm) {
 	case DA_SHS:
-		SHSFinal(&context->context.shs); /* doesn't output as chars */
+        SHSFinal(digest, &context->context.shs); /* doesn't output as chars */
 		break;
 
 	case DA_MD2:

@@ -1,7 +1,7 @@
 /*
 	R_RANDOM.C - random objects for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -181,7 +181,7 @@ R_RANDOM_STRUCT *random;                                /* random structure */
 		cnow = clock();
 
 		R_RandomUpdate(random, (POINTER)gmt, sizeof(struct tm));
-		R_RandomUpdate(random, &cnow, sizeof(clock_t));
+        R_RandomUpdate(random, (POINTER)&cnow, sizeof(clock_t));
 	}
 
 	/* Clean Up time data */
@@ -202,8 +202,8 @@ R_RANDOM_STRUCT *random;
 	MD5_CTX context;
 
 	for(i = 0; i < 16; i++) {
-        random->state[i] ^= (char) clock();
-        random->state[15-i] ^= (char) time(NULL);
+        random->state[i] ^= (unsigned char) clock();
+        random->state[15-i] ^= (unsigned char) time(NULL);
 	}
 
 	/* Clear any old state with new data */

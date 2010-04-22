@@ -1,7 +1,7 @@
 /*
 	NN.C - natural numbers routines
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -22,6 +22,11 @@
 		0.91 Second revision, this is the current revision, all
 		routines have been altered for speed increases.  Also the
 		addition of assembler equivalents.
+
+        1.02 Third revision, minor bug fixes.
+        dmult bug fix, Bug reported by Anders Heerfordt <i3683@dc.dk>.
+
+        1.03 Fourth revision, SunCompiler patch
 */
 
 #include "rsaeuro.h"
@@ -50,8 +55,7 @@ unsigned char *b;
 unsigned int digits, len;
 {
   NN_DIGIT t;
-  int j;
-  unsigned int i, u;
+  unsigned int i, j, u;
   
   for (i = 0, j = len - 1; i < digits && j >= 0; i++) {
     t = 0;
@@ -77,8 +81,7 @@ unsigned char *a;
 unsigned int digits, len;
 {
 	NN_DIGIT t;
-	int j;
-	unsigned int i, u;
+    unsigned int i, j, u;
 
 	for (i = 0, j = len - 1; i < digits && j >= 0; i++) {
 		t = b[i];
@@ -134,13 +137,25 @@ unsigned int digits;
 
 	if(digits)
 		do {
+            /* Bug fix 16/10/95 - JSK, code below removed, caused bug with
+               Sun Compiler SC4.
+
 			if((temp = (*b++) - borrow) == MAX_NN_DIGIT)
-				temp = MAX_NN_DIGIT - *c++;
-			else
-				if((temp -= *c) > (MAX_NN_DIGIT - *c++))
+                temp = MAX_NN_DIGIT - *c++;
+            */
+
+            temp = *b - borrow;
+            b++;
+            if(temp == MAX_NN_DIGIT) {
+                temp = MAX_NN_DIGIT - *c;
+                c++;
+            }else {      /* Patch to prevent bug for Sun CC */
+                if((temp -= *c) > (MAX_NN_DIGIT - *c))
 					borrow = 1;
 				else
 					borrow = 0;
+                c++;
+            }
 			*a++ = temp;
 		}while(--digits);
 
@@ -585,11 +600,13 @@ unsigned int digits;
 		do {
 			if((temp = (*b++) + carry) < carry)
 				temp = *c++;
-			else
-				if((temp += *c) < *c++)
+            else {      /* Patch to prevent bug for Sun CC */
+                if((temp += *c) < *c)
 					carry = 1;
 				else
 					carry = 0;
+                c++;
+            }
 			*a++ = temp;
 		}while(--digits);
 

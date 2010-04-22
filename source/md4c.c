@@ -1,4 +1,4 @@
-/* Modifications Copyright (c) J.S.A.Kapp 1994 - 1995.
+/* Modifications Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	 MD4 Component Of RSAEURO using RSA Data Security, Inc.
 	 MD4 Message Digest Algorithm.

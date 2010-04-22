@@ -1,0 +1,3191 @@
+<!DOCTYPE HTML PUBLIC "-//SQ//DTD HTML 2.0 HoTMetaL + extensions//EN">
+<HTML><HEAD><TITLE>RSAEURO Version 1.03 Documentation</TITLE><!-- This
+document was created from RTF source by rtftohtml version 2.7.5 --><!--And then
+hacked around in HotMetal Pro to make things prettier (I hope...)--></HEAD>
+<BODY>
+<HR SIZE="3" ALIGN="CENTER">
+<CENTER><P><FONT SIZE="8">RSA</FONT><FONT SIZE="6"><I>EURO</I></FONT> </P></CENTER>
+<CENTER><FONT SIZE="5">Version 1.03</FONT></CENTER>
+<HR SIZE="3" ALIGN="CENTER">
+<OL>
+<LI><A HREF="#RTFToC1">INTRODUCTION</A></LI>
+<LI><A HREF="#RTFToC15">RANDOM NUMBERS</A></LI>
+<LI><A HREF="#RTFToC25">MESSAGE DIGESTS</A></LI>
+<LI><A HREF="#RTFToC44">DIGITAL SIGNATURE ROUTINES</A></LI>
+<LI><A HREF="#RTFToC55">ENVELOPE PROCESSING</A></LI>
+<LI><A HREF="#RTFToC66">PEM FUNCTIONS</A></LI>
+<LI><A HREF="#RTFToC77">KEY GENERATION AND EXCHANGE</A></LI>
+<LI><A HREF="#RTFToC86">RSA</A></LI>
+<LI><A HREF="#RTFToC93">DES</A></LI>
+<LI><A HREF="#RTFToC105">NATURAL NUMBER ARITHMETIC</A></LI>
+<LI><A HREF="#RTFToC130">MEMORY MANIPULATION</A></LI>
+<LI><A HREF="#RTFToC136">TECHNICAL INFORMATION</A></LI>
+<LI><A HREF="#RTFToC166">APPENDIX A: FUNCTION CROSS-REFERENCE</A></LI></OL>
+<P>
+
+<A NAME="_Toc348263317">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC1">INTRODUCTION</A><A NAME="_Toc348263318"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC2">What is RSAEURO?</A>
+</LI>
+<LI><A HREF="#RTFToC3">What is covered by this document?</A>
+</LI>
+<LI><A HREF="#RTFToC4">Contact information</A>
+</LI>
+<LI><A HREF="#RTFToC5">Typographic conventions</A>
+</LI>
+<LI><A HREF="#RTFToC6">Licence</A>
+</LI>
+<LI><A HREF="#RTFToC7">Patents and trademarks</A><OL>
+<LI><A HREF="#RTFToC8">RSADSI</A>
+</LI>
+<LI><A HREF="#RTFToC9">Cylink</A></LI>
+</OL></LI>
+<LI><A HREF="#RTFToC10">Release history</A><OL>
+<LI><A HREF="#RTFToC11">Release 1.00</A>
+</LI>
+<LI><A HREF="#RTFToC12">Release 1.01</A>
+</LI>
+<LI><A HREF="#RTFToC13">Release 1.02</A>
+</LI>
+<LI><A HREF="#RTFToC14">Release 1.03</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC2">What is RSAEURO?</A>
+</H2>
+<P>RSAEURO is a cryptographic toolkit providing various functions for the use
+of digital signatures, data encryption and supporting areas (PEM encoding,
+random number generation <I>etc</I>).  To aid compatibility with existing
+software, RSAEURO is call-compatible with RSADSI's &quot;RSAREF&quot; toolkit.
+RSAEURO allows non-US residents to make use of much of the cryptographic
+software previously only (legally) available in the US.
+</P>
+<HR ALIGN="CENTER" NOSHADE="NOSHADE">
+<CENTER><P><B>IMPORTANT NOTICE:</B>  Please do not distribute or use this
+software in the US-it is <I>illegal </I>to use this toolkit in the US, as
+public-key cryptography is covered by US patents (see the Patents and Trademarks
+section below for details).  If you are a US resident, please use the RSAREF
+toolkit instead.
+</P></CENTER>
+<HR ALIGN="CENTER" NOSHADE="NOSHADE">
+<P>RSAEURO contains support for the following:
+</P>
+<UL>
+<LI>	RSA encryption, decryption and key generation.  Compatible with RSA
+Laboratories' Public-Key Cryptography Standard (PKCS) #1.
+</LI>
+<LI>	Generation and verification of message digests using MD2, MD4, MD5 and SHS
+(SHS currently not implemented in higher-level functions to maintain
+compatibility with PKCS).
+</LI>
+<LI>	DES encryption and decryption using CBC (1, 2 or 3 keys using
+Encrypt-Decrypt-Encrypt) and DESX, RSADSI's secure DES enhancement.
+</LI>
+<LI>	Diffie-Hellman key agreement as defined in PKCS #3.
+</LI>
+<LI>	PEM support - support for RFC&amp;nbsp;1421 encoded ASCII data with all
+main functions.
+</LI>
+<LI>	Key routines implemented in assembler for speed (80386 and 680x0 currently
+supported).
+<A NAME="_Toc348263319"></A></LI></UL>
+<H2>
+<A NAME="RTFToC3">What is covered by this document?</A>
+</H2>
+<P>This document provides a function-by-function description of the RSAEURO
+toolkit, at a sufficient level of detail to allow the use of the toolkit within
+other software.  The internal workings of the functions are not described. For
+full details of the internal workings of the RSAEURO routines, please consult
+the (well commented) source code.</P>
+<P>
+It is assumed that the reader is familiar with C programming and basic
+cryptography, although a detailed knowledge is not required.</P>
+<P>
+This document is divided into the following sections: 
+</P>
+<DL><DT><B>Introduction (This section).</B></DT>
+<DD>General introduction to RSAEURO.</DD>
+<DT><B>Random numbers</B></DT>
+<DD>Routines for generating cryptographically-secure random numbers, for use by
+various other cryptographic functions. </DD>
+<DT><B>Message digests</B></DT>
+<DD>Routines for the creation and verification of message digests.</DD>
+<DT><B>Digital signatures</B></DT>
+<DD>Routines for the creation and verification of digital signatures. </DD>
+<DT><B>Envelope processing</B></DT>
+<DD>Routines for the creation and use of digital &quot;envelopes&quot; (an &quot;envelope&quot;
+is a structure containing encrypted data and an optional digital signature).</DD>
+<DT><B>PEM functions</B></DT>
+<DD>Routines for processing Interned privacy-enhanced mail (PEM) encoded
+messages.</DD>
+<DT><B>Key generation and exchange</B></DT>
+<DD>Routines for generating key material for RSA encryption, and exchanging
+keys via Diffie-Hellman agreement.</DD>
+<DT><B>RSA</B></DT>
+<DD>Routines for public key encryption and decryption using RSA and PKCS#1.</DD>
+<DT><B>DES</B></DT>
+<DD>Routines for secret-key encryption and decryption using DES in CBC mode,
+with either single or triple-key operation.</DD>
+<DT><B>Natural number arithmetic</B></DT>
+<DD>Low-level routines for performing natural number arithmetic.</DD>
+<DT><B>Memory manipulation</B></DT>
+<DD>Platform-specific memory manipulation routines.</DD>
+<DT><B>Technical information</B></DT>
+<DD>&quot;Technical&quot; programming information, including descriptions of
+RSAEURO data structures, defined values and references to further information.</DD>
+<DT><B>Appendix A: Function cross-reference</B><A NAME="_Toc348263320">
+</A></DT>
+<DD>An alphabetical list of functions with brief details and a reference to
+coverage in the main documentation.</DD></DL>
+<H2>
+<A NAME="RTFToC4">Contact information</A>
+</H2>
+<P>All general comments should be sent to
+<A HREF="mailto:rsaeuro@sourcery.demon.co.uk">rsaeuro@sourcery.demon.co.uk</A>.
+ Bug reports should be sent to
+<A HREF="mailto:rsaeuro-bugs@sourcery.demon.co.uk">rsaeuro-bugs@sourcery.demon.co.uk</A>.
+ Comments or corrections regarding the documentation should be sent to
+<A HREF="mailto:nikb@cix.compulink.co.uk">nikb@cix.compulink.co.uk</A>.</P>
+<P>
+As a last resort, the author may be contacted by &quot;snail-mail&quot; at the
+following address:</P>
+<P>
+Stephen Kapp<BR>The Post Office<BR>Nr. Clitheroe<BR>Lancashire<BR>BB7 3BB<BR>UNITED
+KINDOM
+<A NAME="_Toc348263321">
+</A></P>
+<H2>
+<A NAME="RTFToC5">Typographic conventions</A>
+</H2>
+<P>Throughout this document, blocks of C source code are set in
+<CODE>courier</CODE> , and in-text references to functions, constants and the
+like are set in <B>bold. </B> Conventional C-style mathematical operators are
+used throughout (<I>e.g.</I> * for &quot;times&quot;, / for &quot;divided by&quot;
+<I>etc</I>)
+<A NAME="_Toc348263322">
+</A></P>
+<H2>
+<A NAME="RTFToC6">Licence</A></H2>
+<P>RSAEURO TOOLKIT LICENSE AGREEMENT 15th December 1995</P>
+<P>
+ Copyright (c) J.S.A.Kapp, 1994-1995. 1.	LICENSE. J.S.A.Kapp grants you a
+nonexclusive, non-transferable, perpetual (subject to the conditions of section
+7) license for the &quot;RSAEURO&quot; toolkit (the &quot;Toolkit&quot;) and its
+associated documentation, subject to all of the following terms and conditions:</P>
+<P>
+i.	To use the Toolkit on any computer in your possession.</P>
+<P>
+ii.	to make copies of the Toolkit for back-up purposes.</P>
+<P>
+iii.	to modify the Toolkit in any manner for porting or performance improvement
+purposes (subject to Section 2) or to incorporate the Toolkit into other
+computer programs for your own personal or internal use, provided that you
+provide J.S.A.Kapp with a copy of any such modification or Application Program
+by electronic mail, and grant J.S.A.Kapp a perpetual, royalty-free license to
+use and distribute such modifications and Application Programs on the terms set
+forth in this Agreement.</P>
+<P>
+iv.	To copy and distribute the Toolkit and Application Programs in accordance
+with the limitations set forth in Section 2.</P>
+<P>
+	&quot;Application Programs&quot; are programs that incorporate all or any
+portion of the Toolkit in any form. The restrictions imposed on Application
+Programs in this Agreement shall not apply to any software which through the
+mere aggregation on distribution media, is co-located or stored with the
+Toolkit.</P>
+<P>
+2.	LIMITATIONS ON LICENSE.</P>
+<P>
+i.	J.S.A.Kapp owns the Toolkit and its associated documentation and all
+copyrights therein. You may only use, copy, modify and distribute the Toolkit as
+expressly provided for in this Agreement. You must reproduce and include this
+Agreement, J.S.A.Kapp's copyright notices and disclaimer of warranty on any copy
+and its associated documentation.</P>
+<P>
+ii.	The Toolkit and its associated documentation are freeware for noncommercial
+purposes, however for commercial purposes please contact J.S.A.Kapp for
+licensing details.</P>
+<P>
+iii.	The Toolkit and Application Programs are to be used for noncommercial
+purposes. However, media costs associated with the distribution of the Program
+or Application Programs may be recovered.</P>
+<P>
+iv.	The Toolkit, if modified, must carry prominent notices stating that changes
+have been made, and the dates of any such changes. v. Prior permission from
+J.S.A.Kapp is required for any modifications that access the Toolkit through
+ways other than the published Toolkit interface or for modifications to the
+Toolkit interface, and structures. J.S.A.Kapp will grant all reasonable requests
+for permission to make such modifications.</P>
+<P>
+3.	You are solely responsible for all of your costs and expenses incurred in
+connection with the distribution of the Toolkit or any Application Program
+hereunder, and J.S.A.Kapp shall have no liability, obligation or responsibility
+there of. J.S.A.Kapp shall have no obligation to provide maintenance, support,
+upgrades or new releases to you or to any distributee of the Toolkit or any
+Application Program.</P>
+<P>
+4.	THE TOOLKIT AND ITS ASSOCIATED DOCUMENTATION ARE LICENSED &quot;AS IS&quot;
+WITHOUT WARRANTY AS TO THEIR PERFORMANCE, MERCHANTABILITY OR FITNESS FOR ANY
+PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE RESULTS AND PERFORMANCE OF THE
+TOOLKIT IS ASSUMED BY YOU AND YOUR DISTRIBUTEES. SHOULD THE TOOLKIT PROVE
+DEFECTIVE, YOU AND YOUR DISTRIBUTEES (AND NOT J.S.A.KAPP) ASSUME THE ENTIRE COST
+OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</P>
+<P>
+5.	LIMITATION OF LIABILITY, NEITHER J.S.A.KAPP NOR ANY OTHER PERSON WHO HAS BEEN
+INVOLVED IN THE CREATION, PRODUCTION, OR DELIVERY OF THE TOOLKIT SHALL BE LIABLE
+TO YOU OR TO ANY OTHER PERSON FOR ANY DIRECT, INCIDENTAL OR CONSEQUENTIAL
+DAMAGES, EVEN IF J.S.A.KAPP HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</P>
+<P>
+6.	RSAEURO is a publication of cryptographic techniques. Applications developed
+with RSAEURO may be subject to export controls in some countries. If you are
+located in the United States and develop such applications using RSAEURO, you
+are advised to obtain a copy of RSAREF from RSADSI, as you may using RSAEURO
+infringe on Patents held by RSA Data Security and Cylink.</P>
+<P>
+7.	The license granted hereunder is effective until terminated. You may
+terminate it at anytime by destroying all components of the Toolkit and its
+associated documentation. The termination of your license will not result in the
+termination of the licenses of any distributees who have received rights to the
+Toolkit through you so long as they are in compliance with the provisions of
+this license.</P>
+<P>
+8.	GENERAL</P>
+<P>
+i.	Address all correspondence regarding this license to J.S.A.Kapp's electronic
+mail address &lt;<A HREF="mailto:rsaeuro@sourcery.demon.co.uk">rsaeuro@sourcery.demon.co.uk</A>&gt;,
+or to</P>
+<P>
+	Mr J.S.A.Kapp. <BR>The Post Office, <BR>Dunsop Bridge, <BR>Clitheroe,
+<BR>Lancashire, <BR>England. <BR>BB7 3BB.<BR><BR>Tel. (+44) 1200-448241</P>
+<P>
+ii.	For details of Export Controls and other controls regarding the use of
+cryptographic techniques please contact your country's relevant authority.
+<A NAME="_Toc348263323">
+</A></P>
+<H2>
+<A NAME="RTFToC7">Patents and trademarks</A>
+</H2>
+<P>The following terms are registered trademarks as indicated.  All other
+trademarks acknowledged. To the author's knowledge, all relevant trademarks have
+been duly acknowledged.  If there are any omissions, please provide the relevant
+details and the documentation will be amended accordingly.
+<A NAME="_Toc348263324">
+</A></P>
+<H3>
+<A NAME="RTFToC8">RSADSI</A></H3>
+<P>RSA Data Security Inc (RSADSI) provide consultancy and software engineering
+service in the field of cryptography.  The RSAREF toolkit, on which RSAEURO is
+modelled, is available free of charge from RSADSI with the USA and Canada,
+subject to their licensing agreement. For information regarding licensing
+RSADSI's toolkits, contact Paul Gordon (<A HREF="mailto:paul@rsa.com">paul@rsa.com</A>)
+at RSADSI.</P>
+<P>
+Following a recent arbitration between RSADSI and Cylink, it has been determined
+that RSADSI hold patent rights to the RSA public-key cryptographic algorithm. 
+For details of licensing the RSA algorithm contact Paul Livesay (<A
+HREF="mailto:pol@rsa.com">pol@rsa.com</A>)at RSADSI.</P>
+<P>
+RSADSI can be contacted at:<BR><BR>RSA Data Security Inc,<BR>10 Twin Dolphin
+Drive<BR>Redwood City<BR>CA 94065<BR><BR>Tel. (415) 595-8782.</P>
+<P>
+DESX and RSAREF are registered trademarks of RSADSI.
+<A NAME="_Toc348263325">
+</A></P>
+<H3>
+<A NAME="RTFToC9">Cylink</A></H3>
+<P>At the time of writing it was not possible to determine the legal situation
+regarding patents regarding cryptography held by Cylink.  Interested parties
+should contact Bob Fougner on (+1) 408 735 5893,  e-mail:
+<A NAME="fougner@cylink.com" HREF="mailto:fougner@cylink.com">fougner@cylink.com</A>.
+<A NAME="_Toc348263326">
+</A></P>
+<H2>
+<A NAME="RTFToC10">Release history</A>
+</H2>
+<P>This section describes the changes made at each release of the software.</P>
+<P>
+<A NAME="_Toc348263327">
+</A></P>
+<H3>
+<A NAME="RTFToC11">Release 1.00</A>
+</H3>
+<P>First major release.
+<A NAME="_Toc348263328">
+</A></P>
+<H3>
+<A NAME="RTFToC12">Release 1.01</A>
+</H3>
+<P>Modifications:
+</P>
+<UL>
+<LI>	<B>R_RandomCreate</B> and <B>R_RandomMix</B> modified to improve random
+number generation.  <B>R_RandomMix</B> had a minor flaw as it didn't flush the
+old output from the object.
+<A NAME="_Toc348263329"></A></LI></UL>
+<H3>
+<A NAME="RTFToC13">Release 1.02</A>
+</H3>
+<P>Bug fixes:
+</P>
+<UL>
+<LI>	Fixed bug in <B>R_EncodePEMBlock</B> reported by Wang Wei Jun &lt;wang@iti.gov.sg&gt;.
+</LI>
+<LI>	Fixed bug in <B>R_SealUpdate</B> reported by Anders Heerfordt &lt;i3683@dc.dk&gt;.
+</LI>
+<LI>	Fixed bug in <B>dmult</B>, reported by Anders Heerfordt &lt;i3683@dc.dk&gt;.
+</LI>
+<LI>	Fixed PADDING[] bug for R_ENHANC.C, reported by Anders Heerfordt.
+<A NAME="_Toc348263330"></A></LI></UL>
+<H3>
+<A NAME="RTFToC14">Release 1.03</A>
+</H3>
+<P>Bug fixes:
+</P>
+<UL>
+<LI>	<B>RSAPublicEncrypt</B>, checks that RandomStruct has been initialised
+prior to use.
+</LI>
+<LI>	<B>SHSFinal</B>, digest now output &quot;directly&quot; to a passed
+parameter, context cleared on exit.</LI>
+</UL>
+<P><A NAME="_Toc348263331">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC15">RANDOM NUMBERS</A>
+</H1>
+<OL>
+<LI><A HREF="#RTFToC16">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC17">Functions</A><OL>
+<LI><A HREF="#RTFToC18">R_RandomInit</A>
+</LI>
+<LI><A HREF="#RTFToC19">R_RandomUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC20">R_GetRandomBytesNeeded</A>
+</LI>
+<LI><A HREF="#RTFToC21">R_GenerateBytes</A>
+</LI>
+<LI><A HREF="#RTFToC22">R_RandomFinal</A>
+</LI>
+<LI><A HREF="#RTFToC23">R_RandomCreate</A>
+</LI>
+<LI><A HREF="#RTFToC24">R_RandomMix</A></LI></OL></LI>
+</OL>
+<P>RSAEURO Full documentation, revision 0.90.  18/08/95.
+<A NAME="_Toc348263332">
+</A></P>
+<H2>
+<A NAME="RTFToC16">Introduction</A></H2>
+<P>Various functions within RSAEURO require random data (primarily for key
+generation).  A stream of random (strictly, pseudo-random) data is generated
+using the MD5 digest algorithm and a &quot;seed&quot; value, which is provided
+in the form of the <B>random</B> structure.</P>
+<P>
+Before use, the <B>random</B> structure must be initialised and &quot;seeded&quot;
+itself, by &quot;mixing in&quot; an amount of genuine random data.  The
+procedure for preparing a new random structure is as follows:
+</P>
+<OL>
+<LI>	Reserve <B>sizeof(R_RANDOM_STRUCT)</B> memory.
+</LI>
+<LI>	Initialise the new structure using <B>R_RandomInit</B>.  This sets
+<B>random-                                                                     
+            &gt;bytesNeeded</B>, the number of random bytes required to &quot;seed&quot;
+the structure before use, to RANDOM_BYTES_RQ, and zeroes the data.
+</LI>
+<LI>	&quot;Mix in&quot; a suitable quantity of random data using <B>R_RandomUpdate</B>.
+<B>R_RandomUpdate</B> takes a caller-supplied block of data and combines it
+with the existing random structure using MD5.  <B>R_RandomUpdate</B> also
+decrements <B>random-&gt;bytesNeeded</B>, which indicates the amount of random
+data still required (the <B>R_GetRandomBytesNeeded</B> function returns the
+<B>bytesNeeded</B> value of a given <B>random</B> structure).
+<B>R_RandomUpdate</B> should be called repeatedly until
+<B>R_GetRandomBytesNeeded</B> returns zero.</LI></OL>
+<P><B>R_RandomUpdate</B> may be called once the structure has been initialised
+(<I>i.e.</I> <B>bytesNeeded</B> equals zero).  RANDOM_BYTES_RQ should be
+adjusted according to the &quot;purity&quot; of the random data source.</P>
+<P>
+An additional function, <B>R_RandomCreate</B>, creates and initialises a &quot;fresh&quot;
+<B>random</B> structure using data from the current system clock, via the ANSI
+<B>gmtime</B> function (this function uses a separate variable,
+RANDOM_BYTES_INT, to indicate the amount of mix-in bytes, currently set to 512).
+ On ANSI-compliant systems, <B>R_RandomCreate</B> can be used as a &quot;one-stop
+shop&quot; for producing a ready-to-use <B>random</B> structure. Other sources
+of random data, such as keyboard timings, disk latency and so on are highly
+system-dependant, and have not yet been implemented.</P>
+<P>
+Once a <B>random</B> structure has been created, initialised and seeded, it may
+be used by <B>R_GenerateBytes</B> to produce a stream of pseudo-random data.
+<B>R_GenerateBytes</B> returns an error if an invalid (non-seeded)
+<B>random</B> structure is referenced.</P>
+<P>
+The function <B>R_RandomMix</B> uses the ANSI <B>clock</B> and <B>time
+</B>functions to randomise the current state of an existing, initialised random
+structure.  Then flush any pending output from the output state.</P>
+<P>
+The function <B>R_RandomFinal</B> clears a <B>random</B> structure.
+<A NAME="_Toc348263333">
+</A></P>
+<H2>
+<A NAME="RTFToC17">Functions</A><A NAME="R_RandomInit"></A><A
+NAME="_Toc348263334"></A></H2>
+<H3>
+<A NAME="RTFToC18">R_RandomInit</A></H3>
+<P><CODE>int R_RandomInit(random)R_RANDOM_STRUCT *random; /* random structure
+*/</CODE></P>
+<P>
+Initialises a new <B>random</B> structure.  Zeroes the data area and sets
+<B>random-&gt;bytesNeeded</B> to the system default (RANDOM_BYTES_RQ).  Always
+returns IDOK.
+<A NAME="R_RandomUpdate"></A><A NAME="_Toc348263335">
+</A></P>
+<H3>
+<A NAME="RTFToC19">R_RandomUpdate</A></H3>
+<P><CODE>int R_RandomUpdate(random, block, len)<BR>R_RANDOM_STRUCT
+*random;	/* random structure */<BR>unsigned char *block;	/* block of data */<BR>unsigned
+int len;	/* length of block */</CODE></P>
+<P>
+Updates a previously initialised <B>random</B> structure by mixing in a block
+of caller-supplied data using MD5.  Updates <B>random-&gt;bytesNeeded</B> as
+appropriate. Always returns IDOK.
+<A NAME="R_GetRandomBytesNeeded"></A><A NAME="_Toc348263336">
+</A></P>
+<H3>
+<A NAME="RTFToC20">R_GetRandomBytesNeeded</A></H3>
+<P><CODE>int R_GetRandomBytesNeeded(bytesNeeded, random)<BR>unsigned int
+*bytesNeeded	/* number of mix-in bytes needed */<BR>R_RANDOM_STRUCT *random	/*
+random structure */</CODE></P>
+<P>
+Returns the number of seed bytes still required for the <B>random
+</B>structure. On exit, <B>bytesNeeded </B>contains the number of bytes
+required by the structure <B>random</B>.  Always returns IDOK.
+<A NAME="R_GenerateBytes"></A><A NAME="_Toc348263337">
+</A></P>
+<H3>
+<A NAME="RTFToC21">R_GenerateBytes</A></H3>
+<P><CODE>int R_GenerateBytes(block, len, random)<BR>unsigned char *block;	/*
+block */<BR>unsigned int len; 	/* length of block */<BR>R_RANDOM_STRUCT
+*random;	/* random structure */</CODE></P>
+<P>
+Populates <B>block </B>with <B>len </B>pseudo-random bytes derived from
+<B>random </B>using MD5. Returns RE_NEED_RANDOM if random has not been fully
+initialised, IDOK otherwise.
+<A NAME="R_RandomFinal"></A><A NAME="_Toc348263338">
+</A></P>
+<H3>
+<A NAME="RTFToC22">R_RandomFinal</A></H3>
+<P><CODE>void R_RandomFinal(random)<BR>R_RANDOM_STRUCT *random;	/* random
+structure */</CODE></P>
+<P>
+Clears a <B>random</B> structure, setting all values and data to zero.
+<A NAME="R_RandomCreate"></A><A NAME="_Toc348263339">
+</A></P>
+<H3>
+<A NAME="RTFToC23">R_RandomCreate</A></H3>
+<P><CODE>void R_RandomCreate(random)<BR>R_RANDOM_STRUCT *random;	/* random
+structure */</CODE></P>
+<P>
+Initialises a <B>random</B> structure and seeds it with data derived using the
+ANSI <B>gmtime</B> and <B>clock </B>function.  The quantity of seeding data is
+defined by RANDOM_BYTES_RQINT.
+<A NAME="R_RandomMix"></A><A NAME="_Toc348263340">
+</A></P>
+<H3>
+<A NAME="RTFToC24">R_RandomMix</A></H3>
+<P><CODE>void R_RandomMix(random)<BR>R_RANDOM_STRUCT *random;</CODE></P>
+<P>
+Randomises the internal state of the supplied <B>random</B> structure, using
+data from the ANSI <B>clock</B> and <B>time</B> functions, then flushes any
+pending output.
+<A NAME="_Toc348263341">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC25">MESSAGE DIGESTS</A>
+<A NAME="_Toc348263342"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC26">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC27">Functions</A><OL>
+<LI><A HREF="#RTFToC28">R_DigestInit</A>
+</LI>
+<LI><A HREF="#RTFToC29">R_DigestUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC30">R_DigestFinal</A>
+</LI>
+<LI><A HREF="#RTFToC31">R_DigestBlock</A>
+</LI>
+<LI><A HREF="#RTFToC32">MD2Init</A>
+</LI>
+<LI><A HREF="#RTFToC33">MD2Update</A>
+</LI>
+<LI><A HREF="#RTFToC34">MD2Final</A>
+</LI>
+<LI><A HREF="#RTFToC35">MD4Init</A>
+</LI>
+<LI><A HREF="#RTFToC36">MD4Update</A>
+</LI>
+<LI><A HREF="#RTFToC37">MD4Final</A>
+</LI>
+<LI><A HREF="#RTFToC38">MD5Init</A>
+</LI>
+<LI><A HREF="#RTFToC39">MD5Update</A>
+</LI>
+<LI><A HREF="#RTFToC40">MD5Final</A>
+</LI>
+<LI><A HREF="#RTFToC41">SHSInit</A>
+</LI>
+<LI><A HREF="#RTFToC42">SHSUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC43">SHSFinal</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC26">Introduction</A></H2>
+<P>RSAEURO supports four different message digest algorithms: MD2, MD4, MD5 and
+Secure Hash Standard (SHS). The current MD2, MD4 and MD5 routines are based on
+source code made available by RSADSI.</P>
+<P>
+Support for each digest method consists of three basic functions: <B>init</B>,
+which initialises the relevant structures and contexts; <B>update</B>, which
+adds data to the digest, and <B>final</B> which &quot;tidies up&quot; and
+returns the final digest value.  To simplify implementation, the digest and
+signature routines are called via &quot;parent&quot; routines, with the
+algorithm to be used passed as a parameter.</P>
+<P>
+High-level functions are provided for processing data which is memory-resident.
+These functions handle all memory allocation, initialisation and processing
+internally, providing a &quot;one-stop shop&quot; solution.  However, as the
+data to be processed must be resident in memory, the run-time resource
+requirements of these functions are larger than the init-update-final method.</P>
+<P>
+The procedure for producing a message digest is as follows:
+</P>
+<OL>
+<LI>	Initialise the digest &quot;context&quot;, containing the digest generator
+state, input buffer <I>etc</I>, by calling <B>R_DigestInit</B>.  The digest
+type (MD2, MD4, MD5 or SHS) is specified as a parameter to <B>R_DigestInit</B>.
+</LI>
+<LI>	Process the source data a block at a time, using <B>R_DigestUpdate</B>.
+</LI>
+<LI>	Produce the final digest value using <B>R_DigestFinal</B>.</LI></OL>
+<P>The
+<B>R_Digest </B>functions act as  &quot;wrappers&quot; for the
+algorithm-specific message digest routines.  An additional function, <B>R_DigestBlock</B>,
+may be used for memory-resident data.
+<A NAME="_Toc348263343">
+</A></P>
+<H2>
+<A NAME="RTFToC27">Functions</A><A NAME="R_DigestInit"></A><A
+NAME="_Toc348263344"></A></H2>
+<H3>
+<A NAME="RTFToC28">R_DigestInit</A></H3>
+<P><CODE>int R_DigestInit(context, digesttype)<BR>R_DIGEST_CTX *context;	/*
+new context */<BR>int digesttype;	/* message-digest algorithm */</CODE></P>
+<P>
+Initialises a context ready for digest production.  The R_DIGEST_CTX type is a
+union structure supporting the different context types required for each message
+digest algorithm.  <B>context</B> is a pointer to a &quot;blank&quot;
+R_DIGEST_CTX structure, <B>digesttype</B> indicates the digest algorithm to be
+used.  Currently supported digest types are DA_MD2, DA_MD4, DA_MD5 and DA_SHS.
+Returns RE_DIGEST_ALGORITHM if an invalid (unsupported) digest algorithm is
+selected, IDOK otherwise.
+<A NAME="R_DigestUpdate"></A><A NAME="_Toc348263345">
+</A></P>
+<H3>
+<A NAME="RTFToC29">R_DigestUpdate</A></H3>
+<P><CODE>int R_DigestUpdate(context, partIn, partInLen)<BR>R_DIGEST_CTX
+*context; /* context */<BR>unsigned char *partIn;	/* next data part */<BR>unsigned
+int partInLen;	/* length of next data part */</CODE></P>
+<P>
+Updates <B>context</B> using the appropriate digest algorithm (as indicated by
+the context) with the supplied data.  <B>partIn</B> points to the data block,
+<B>partInLen</B> indicates the length of the block in bytes.  Returns
+RE_DIGEST_ALGORITHM if an invalid (unsupported) digest algorithm is selected,
+IDOK otherwise.
+<A NAME="R_DigestFinal"></A><A NAME="_Toc348263346">
+</A></P>
+<H3>
+<A NAME="RTFToC30">R_DigestFinal</A></H3>
+<P><CODE>int R_DigestFinal(context, digest, digestLen)<BR>R_DIGEST_CTX
+*context; /* context */<BR>unsigned char *digest;	/* message digest */<BR>unsigned
+int *digestLen;	/* length of message digest */</CODE></P>
+<P>
+Produces the final digest value from <B>context</B>.  On exit, <B>digest</B>
+contains the message digest and <B>digestLen</B> indicates length of the digest
+in bytes.  <B>R_DigestFinal</B> also zeroes the context to remove any sensitive
+data from memory.  Returns RE_DIGEST_ALGORITHM if an invalid (unsupported)
+digest algorithm is selected, IDOK otherwise.
+<A NAME="R_DigestBlock"></A><A NAME="_Toc348263347">
+</A></P>
+<H3>
+<A NAME="RTFToC31">R_DigestBlock</A></H3>
+<P><CODE>int R_DigestBlock(digest, digestLen, block, blockLen,
+digestAlgorithm)<BR>unsigned char *digest;	/* message digest */<BR>unsigned
+int *digestLen;	/* length of message digest */<BR>unsigned char *block;	/*
+block */<BR>unsigned int blockLen;	/* length of block */<BR>int
+digestAlgorithm;	/* message-digest algorithm */</CODE></P>
+<P>
+Produces a digest of the data block supplied (pointed to by <B>block</B>,
+<B>blockLen</B> bytes long), using the digest algorithm indicated by
+<B>digestAlgorithm</B>.  On success, the digest is returned in <B>digest</B>,
+and the length of the digest is indicated by <B>digestLen</B>.  Context
+creation, initialisation and clearing is handled internally.</P>
+<P>
+Returns RE_DIGEST_ALGORITHM if an invalid (unsupported) digest algorithm is
+selected, IDOK otherwise.
+<A NAME="MD2Init"></A><A NAME="_Toc348263348">
+</A></P>
+<H3>
+<A NAME="RTFToC32">MD2Init</A></H3>
+<P><CODE>void MD2Init(context)<BR>MD2_CTX *context;	/* context */</CODE></P>
+<P>
+Initialises a new MD2 context, ready for digest production.  <B>context </B>is
+a pointer to a &quot;blank&quot; MD2_CTX structure.
+<A NAME="MD2Update"></A><A NAME="_Toc348263349">
+</A></P>
+<H3>
+<A NAME="RTFToC33">MD2Update</A></H3>
+<P><CODE>void MD2Update(context, input, inputLen)<BR>MD2_CTX *context;	/*
+context */<BR>unsigned char *input;	/* input block */<BR>unsigned int
+inputLen;	/* length of input block */</CODE></P>
+<P>
+Updates the MD2 <B>context</B> from the supplied data block (pointed to by
+<B>input</B>, <B>inputLen</B> bytes long).  <B>context</B> must be an MD2_CTX
+structure which has been initialised using <B>MD2_init</B>.  No checks are made
+for context validity.</P>
+<P>
+<A NAME="MD2Final"></A><A NAME="_Toc348263350">
+</A></P>
+<H3>
+<A NAME="RTFToC34">MD2Final</A></H3>
+<P><CODE>void MD2Final(digest, context)<BR>unsigned char digest[16];	/*
+message digest */<BR>MD2_CTX *context;	/* context */</CODE></P>
+<P>
+Produces the final MD2 digest value from <B>context</B>.  <B>context</B> must
+be an MD2_CTX structure which has been initialised using <B>MD2_init</B>.  No
+checks are made for context validity.  On exit, <B>digest</B> contains the MD2
+message digest. <B>MD2Final</B> zeroes the context to remove any sensitive data
+from memory.
+<A NAME="MD4Init"></A><A NAME="_Toc348263351">
+</A></P>
+<H3>
+<A NAME="RTFToC35">MD4Init</A></H3>
+<P><CODE>void MD4Init(context)<BR>MD4_CTX *context;	/* context */</CODE></P>
+<P>
+Initialises a new MD4 context, ready for digest production.  <B>context </B>is
+a pointer to a &quot;blank&quot; MD4_CTX structure.
+<A NAME="MD4Update"></A><A NAME="_Toc348263352">
+</A></P>
+<H3>
+<A NAME="RTFToC36">MD4Update</A></H3>
+<P><CODE>void MD4Update(context, input, inputLen)<BR>MD4_CTX *context;	/*
+context */<BR>unsigned char *input;	/* input block */<BR>unsigned int
+inputLen;	/* length of input block */</CODE></P>
+<P>
+Updates the MD4 <B>context</B> from the supplied data block (pointed to by
+<B>input</B>, <B>inputLen</B> bytes long).  <B>context</B> must be an MD4_CTX
+structure which has been initialised using <B>MD4_init</B>.  No checks are made
+for context validity.
+<A NAME="MD4Final"></A><A NAME="_Toc348263353">
+</A></P>
+<H3>
+<A NAME="RTFToC37">MD4Final</A></H3>
+<P><CODE>void MD4Final(digest, context)<BR>unsigned char digest[16];	/*
+message digest */<BR>MD4_CTX *context;	/* context */</CODE></P>
+<P>
+Produces the final MD4 digest value from <B>context</B>.  <B>context</B> must
+be an MD4_CTX structure which has been initialised using <B>MD4_init</B>.  No
+checks are made for context validity.  On exit, <B>digest</B> contains the MD4
+message digest. MD4<B>Final</B> zeroes the context to remove any sensitive data
+from memory.
+<A NAME="MD5Init"></A><A NAME="_Toc348263354">
+</A></P>
+<H3>
+<A NAME="RTFToC38">MD5Init</A></H3>
+<P><CODE>void MD5Init (context)<BR>MD5_CTX *context;	/* context */</CODE></P>
+<P>
+Initialises a new MD5 context, ready for digest production.  <B>context </B>is
+a pointer to a &quot;blank&quot; MD5_CTX structure.
+<A NAME="MD5Update"></A><A NAME="_Toc348263355">
+</A></P>
+<H3>
+<A NAME="RTFToC39">MD5Update</A></H3>
+<P><CODE>void MD5Update(context, input, inputLen)<BR>MD5_CTX *context;	/*
+context */<BR>unsigned char *input;	/* input block */<BR>unsigned int
+inputLen;	/* length of input block */</CODE></P>
+<P>
+Updates the MD5 <B>context</B> from the supplied data block (pointed to by
+<B>input</B>, <B>inputLen</B> bytes long).  <B>context</B> must be an MD5_CTX
+structure which has been initialised using <B>MD5_init</B>.  No checks are made
+for context validity.
+<A NAME="MD5Final"></A><A NAME="_Toc348263356">
+</A></P>
+<H3>
+<A NAME="RTFToC40">MD5Final</A></H3>
+<P><CODE>void MD5Final (digest, context)<BR>unsigned char digest[16];	/*
+message digest */<BR>MD5_CTX *context;	/* context */</CODE></P>
+<P>
+Produces the final MD5 digest value from <B>context</B>.  <B>context</B> must
+be an MD5_CTX structure which has been initialised using <B>MD5_init</B>.  No
+checks are made for context validity.  On exit, <B>digest</B> contains the MD5
+message digest. MD5<B>Final</B> zeroes the context to remove any sensitive data
+from memory.
+<A NAME="SHSInit"></A><A NAME="_Toc348263357">
+</A></P>
+<H3>
+<A NAME="RTFToC41">SHSInit</A></H3>
+<P><CODE>void SHSInit(context)<BR>SHS_CTX *context;	/* context */</CODE></P>
+<P>
+Initialises a new SHS context, ready for digest production.  <B>context </B>is
+a pointer to a &quot;blank&quot; SHS_CTX structure.
+<A NAME="SHSUpdate"></A><A NAME="_Toc348263358">
+</A></P>
+<H3>
+<A NAME="RTFToC42">SHSUpdate</A></H3>
+<P><CODE>void SHSUpdate(context, buffer, count)<BR>SHS_CTX *context;	/*
+context */<BR>BYTE *buffer;	/* input block */<BR>int count; 	/* length of
+input block */</CODE></P>
+<P>
+Updates the SHS <B>context</B> from the supplied data block (pointed to by
+<B>buffer</B>, <B>count</B> bytes long).  <B>context</B> must be an SHS_CTX
+structure which has been initialised using <B>SHS_init</B>.  No checks are made
+for context validity.</P>
+<P>
+<A NAME="SHSFinal"></A><A NAME="_Toc348263359">
+</A></P>
+<H3>
+<A NAME="RTFToC43">SHSFinal</A></H3>
+<P><CODE>void SHSFinal(digest, context)<BR>char *digest	/* digest */<BR>SHS_CTX
+*context;	/* context */</CODE></P>
+<P>
+Produces the final SHS digest value from <B>context</B>, returning the digest
+in <B>digest</B>.  <B>context</B> must be an SHS_CTX structure which has been
+initialised using <B>SHS_init</B>.  No checks are made for context validity. On
+exit,<B> digest</B> contains the SHS message digest, and <B>context</B> is
+cleared.</P>
+<P>
+<A NAME="_Toc348263360">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC44">DIGITAL SIGNATURE ROUTINES</A>
+<A NAME="_Toc348263361"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC45">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC46">Functions</A><OL>
+<LI><A HREF="#RTFToC47">R_SignInit</A>
+</LI>
+<LI><A HREF="#RTFToC48">R_SignUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC49">R_SignFinal</A>
+</LI>
+<LI><A HREF="#RTFToC50">R_SignBlock</A>
+</LI>
+<LI><A HREF="#RTFToC51">R_VerifyInit</A>
+</LI>
+<LI><A HREF="#RTFToC52">R_VerifyUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC53">R_VerifyFinal</A>
+</LI>
+<LI><A HREF="#RTFToC54">R_VerifyBlockSignature</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC45">Introduction</A></H2>
+<P>RSAEURO provides support for digital signatures using MD2, MD4 and MD5
+digests (to maintain compliance with PKCS #1, SHS cannot be used for digital
+signatures, as it produces a 160 bit digest).</P>
+<P>
+Signature generation consists of three basic functions: <B>init</B>, which
+initialises the relevant structures and contexts; <B>update</B>, which adds
+data to the digest, and <B>final</B> which &quot;tidies up&quot;, generates the
+final digest value, and encrypts it using the sender's secret key to produce the
+signature.  To simplify implementation, the signature routines are called via &quot;parent&quot;
+routines, with the digest algorithm required passed as a parameter.</P>
+<P>
+High-level functions are provided for processing data which is memory-resident.
+These functions handle all memory allocation, initialisation and processing
+internally, providing a &quot;one-stop shop&quot; solution.  However, as the
+data to be processed must be resident in memory, the run-time resource
+requirements of these functions are larger than the init-update-final method.</P>
+<P>
+The procedure for producing a digital signature is as follows:
+</P>
+<OL>
+<LI>	Initialise the signature context by calling <B>R_SignInit</B>.  The
+message digest type required is passed as a parameter.  To maintain PKCS #1
+compatibility, SHS is rejected by <B>R_SignInit</B> as a digest type.
+</LI>
+<LI>	Process the source data a block at a time using <B>R_SignUpdate</B>.
+</LI>
+<LI>	Produce the final signature using <B>R_SignFinal</B>.  The sender's
+private key is passed as a parameter.  RSA is the only algorithm supported for
+signatures.</LI></OL>
+<P>An additional function, <B>R_SignBlock</B>, may be used to produce a
+signature for memory-resident data.</P>
+<P>
+RSAEURO also provides routines for verifying a supplied signature.  The
+procedure is as follows:
+</P>
+<OL>
+<LI>	Initialise the signature context by calling <B>R_VerifyInit</B>.  The
+message digest type required is passed as a parameter.  To maintain PKCS #1
+compatibility, SHS is rejected by <B>R_SignInit</B> as a digest type.
+</LI>
+<LI>	Process the source data a block at a time using <B>R_VerifyUpdate</B>.
+</LI>
+<LI>	Produce the final digest and verify it against a supplied signature using
+<B>R_VerifyFinal</B>.  The sender's public key is passed as a parameter, to
+allow the decryption of the supplied signature.  RSA is the only algorithm
+supported for signatures.</LI></OL>
+<P>An additional function, <B>R_VerifyBlock</B>, may be used to verify a
+signature for memory-resident data.
+<A NAME="_Toc348263362">
+</A></P>
+<H2>
+<A NAME="RTFToC46">Functions</A><A NAME="R_SignInit"></A><A
+NAME="_Toc348263363"></A></H2>
+<H3>
+<A NAME="RTFToC47">R_SignInit</A></H3>
+<P><CODE>int R_SignInit(context, digesttype)<BR>R_SIGNATURE_CTX *context;	/*
+new context */<BR>int digesttype;	/* message-digest algorithm */</CODE></P>
+<P>
+Initialises a digest context ready for signature production.  The
+R_SIGNATURE_CTX type is a union structure supporting the different context types
+required for each message digest algorithm.  <B>context</B> is a pointer to a &quot;blank&quot;
+R_SIGNATURE_CTX structure, <B>digesttype</B> indicates the digest algorithm to
+be used.  Returns RE_DIGEST_ALGORITHM if an invalid digest type is specified
+(such as SHS), IDOK otherwise.
+<A NAME="R_SignUpdate"></A><A NAME="_Toc348263364">
+</A></P>
+<H3>
+<A NAME="RTFToC48">R_SignUpdate</A></H3>
+<P><CODE>int R_SignUpdate(context, partIn, partInLen)<BR>R_SIGNATURE_CTX
+*context; /* context */<BR>unsigned char *partIn;	/* next data part */<BR>unsigned
+int partInLen;	/* length of next data part */</CODE></P>
+<P>
+Updates <B>context </B>using the appropriate digest algorithm (as indicated by
+the context) with the supplied data (<B>partInLen</B> bytes from
+<B>partIn</B>).  Returns RE_DIGEST_ALGORITHM if an invalid digest type is
+specified (such as SHS), IDOK otherwise.
+<A NAME="R_SignFinal"></A><A NAME="_Toc348263365">
+</A></P>
+<H3>
+<A NAME="RTFToC49">R_SignFinal</A></H3>
+<P><CODE>int R_SignFinal(context, signature, signatureLen, privateKey)<BR>R_SIGNATURE_CTX
+*context;	/* context */<BR>unsigned char *signature;	/* signature */<BR>unsigned
+int *signatureLen;	/* length of signature */<BR>R_RSA_PRIVATE_KEY
+*privateKey;	/* signer's RSA private key */</CODE></P>
+<P>
+Produces a signature from the supplied context and private key.  The digest
+value is first calculated using <B>R_DigestFinal </B>and the <B>context</B>,
+and this value is then encrypted using RSA with <B>privatekey</B>.  The
+encrypted value is returned in <B>signature</B>, and the length of the
+signature is returned in <B>signatureLen</B>.  Returns RE_PRIVATE_KEY if the
+private key is invalid, RE_DIGEST_ALGORITHM if an invalid digest type is
+specified (such as SHS), IDOK otherwise.</P>
+<P>
+<B>R_SignFinal</B> &quot;restarts&quot; the signature context, ready for
+re-use, and clears all sensitive information.
+<A NAME="R_SignBlock"></A><A NAME="_Toc348263366">
+</A></P>
+<H3>
+<A NAME="RTFToC50">R_SignBlock</A></H3>
+<P><CODE>int R_SignBlock(signature, signatureLen, block,
+blockLen,digestAlgorithm, privateKey)<BR>unsigned char *signature;	/* signature
+*/<BR>unsigned int *signatureLen;	 /* length of signature */<BR>unsigned char
+*block;	/* block */<BR>unsigned int blockLen;	/* length of block */<BR>int
+digestAlgorithm;	/* message-digest algorithm */<BR>R_RSA_PRIVATE_KEY
+*privateKey;	/* signer's RSA private key */</CODE></P>
+<P>
+Produces a signature for the data block supplied (pointed to by <B>block</B>,
+<B>blockLen</B> bytes long).  <B>digestAlgorithm</B> indicates the required
+message digest algorithm, <B>privateKey</B> is the sender's RSA private key. On
+success, returns IDOK, <B>signature</B> contains the generated signature,
+<B>signatureLen</B> indicates the length in bytes of the signature.  On error,
+returns RE_DIGEST_ALGORITHM if an invalid digest algorithm is selected or
+RE_PRIVATE_KEY if the private key is invalid.
+<A NAME="R_VerifyInit"></A><A NAME="_Toc348263367">
+</A></P>
+<H3>
+<A NAME="RTFToC51">R_VerifyInit</A></H3>
+<P><CODE>int R_VerifyInit(context, digesttype)<BR>R_SIGNATURE_CTX
+*context;	/* new context */<BR>int digesttype;	/* message-digest algorithm */</CODE></P>
+<P>
+Initialises <B>context </B>ready for signature verification. The
+R_SIGNATURE_CTX type is a union structure supporting the different context types
+required for each message digest algorithm.  <B>context</B> is a pointer to a &quot;blank&quot;
+R_SIGNATURE_CTX structure, <B>digesttype</B> indicates the digest algorithm to
+be used. Returns RE_DIGEST_ALGORITHM if an invalid digest type is specified
+(such as SHS), IDOK otherwise.
+<A NAME="R_VerifyUpdate"></A><A NAME="_Toc348263368">
+</A></P>
+<H3>
+<A NAME="RTFToC52">R_VerifyUpdate</A></H3>
+<P><CODE>int R_VerifyUpdate(context, partIn, partInLen)<BR>R_SIGNATURE_CTX
+*context;	/* context */<BR>unsigned char *partIn;	/* next data part */<BR>unsigned
+int partInLen; 	/* length of next data part */</CODE></P>
+<P>
+Updates <B>context </B>using the appropriate digest algorithm (as indicated by
+the context) with the supplied data (<B>partInLen</B> bytes from
+<B>partIn</B>).  Returns RE_DIGEST_ALGORITHM if an invalid digest type is
+specified (such as SHS), IDOK otherwise.
+<A NAME="R_VerifyFinal"></A><A NAME="_Toc348263369">
+</A></P>
+<H3>
+<A NAME="RTFToC53">R_VerifyFinal</A></H3>
+<P><CODE>int R_VerifyFinal(context, signature, signatureLen, publicKey)<BR>R_SIGNATURE_CTX
+*context;	/* context */<BR>unsigned char *signature;	/* signature */<BR>unsigned
+int *signatureLen;	/* length of signature */<BR>R_RSA_PRIVATE_KEY
+*privateKey;	/* signer's RSA public key */</CODE></P>
+<P>
+Verifies the supplied signature against the digest produced from the supplied
+context.  Returns zero for success, RE_LEN if the supplied signature is too long
+(greater than MAX_SIGNATURE_LEN), RE_PUBLIC_KEY if the supplied public key
+cannot decrypt the signature correctly, RE_SIGNATURE if the message digests do
+not match or RE_DIGEST_ALGORITHM if an invalid digest type is specified (such as
+SHS).
+<A NAME="R_VerifyBlockSignature"></A><A NAME="_Toc348263370">
+</A></P>
+<H3>
+<A NAME="RTFToC54">R_VerifyBlockSignature</A></H3>
+<P><CODE>int R_VerifyBlockSignature( block, blockLen, signature, signatureLen,<BR>
+                          digestAlgorithm, publicKey)<BR>unsigned char *block;
+/* block */<BR>unsigned int blockLen;	/* length of block */<BR>unsigned char
+*signature;	/* signature */<BR>unsigned int signatureLen; 	/* length of
+signature */<BR>int digestAlgorithm;	/* message-digest algorithm */<BR>R_RSA_PUBLIC_KEY
+*publicKey;	/* signer's RSA public key */</CODE></P>
+<P>
+Verifies the signature of a memory-resident data block (pointed to by
+<B>block</B>, <B>blockLen </B>bytes long).  <B>digestAlgorithm</B> indicates
+the required message digest algorithm, <B>publicKey</B> is the sender's RSA
+public key, <B>signature</B> points to the signature to verify and
+<B>signatureLen</B> indicates the length of the signature in bytes.
+RE_DIGEST_ALGORITHM if an invalid digest algorithm is selected. On success,
+returns zero.  On error, returns RE_DIGEST_ALGORITHM if an invalid digest
+algorithm is selected, RE_LEN if the supplied signature is too long (greater
+than MAX_SIGNATURE_LEN), RE_PUBLIC_KEY if the supplied public key cannot decrypt
+the signature correctly or RE_SIGNATURE if the message digests do not match.
+<A NAME="_Toc348263371">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC55">ENVELOPE PROCESSING</A>
+<A NAME="_Toc348263372"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC56">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC57">Sealing data in digital envelopes</A>
+</LI>
+<LI><A HREF="#RTFToC58">Opening digital envelopes</A>
+</LI>
+<LI><A HREF="#RTFToC59">Functions</A><OL>
+<LI><A HREF="#RTFToC60">R_SealInit</A>
+</LI>
+<LI><A HREF="#RTFToC61">R_SealUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC62">R_SealFinal</A>
+</LI>
+<LI><A HREF="#RTFToC63">R_OpenInit</A>
+</LI>
+<LI><A HREF="#RTFToC64">R_OpenUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC65">R_OpenFinal</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC56">Introduction</A></H2>
+<P>RSAEURO uses the concept of a &quot;digital envelope&quot; for handling
+encrypted data. Data is first encrypted using a secret-key algorithm, using a
+random session key.  The session key is then encrypted using the public keys of
+the intended recipients.  The encrypted versions of the session key and the
+secret-key encrypted message form the digital envelope.  &quot;Opening&quot; a
+digital envelope requires the decryption of the session key, using the
+recipient's private key (assuming the recipient is one of the intended
+recipients!), then using the session key to decrypt the message.</P>
+<P>
+RSAEURO provides four varieties of secret-key encryption, all based on the US
+Data Encryption Standard (DES): 
+</P>
+<UL><LI><B>EA_DES_CBC</B>  DES in cipher-block chaining (CBC) mode, using a
+single key.</LI>
+<LI><B>EA_DESX_CBC</B>  RSADSI's &quot;enhanced&quot; DES (CBC with an
+additional XOR with a secret value).</LI>
+<LI><B>EA_DES_EDE3_CBC</B>  Triple-DES, using three keys, in CBC mode.  EDE is
+&quot;Encrypt-Decrypt-Encrypt&quot;, where data is encrypted with key1,
+decrypted with key2, then encrypted with key3.  EDE avoids certain weaknesses of
+&quot;plain&quot; multiple encryption.              </LI>
+<LI><B>EA_DES_EDE2_CBC</B>  Triple-DES using two keys (key1 and key 3 are
+identical).</LI></UL>
+<P>EA_DES_EDE3_CBC is the most secure, and the slowest, method of encryption
+supported by RSAEURO.
+<A NAME="_Toc348263373">
+</A></P>
+<H2>
+<A NAME="RTFToC57">Sealing data in digital envelopes</A>
+</H2>
+<P>The procedure for &quot;sealing&quot; data in a digital envelope is as
+follows:
+</P>
+<OL>
+<LI>	Initialise the envelope context, by calling <B>R_SealInit</B>.
+<B>R_SealInit </B>generates the random session key and returns the public-key
+encrypted versions of the session key (the session key itself, together with
+other intermediate data, is stored in the context).  The secret-key encryption
+method to use is specified as a parameter to <B>R_SealInit</B>.
+</LI>
+<LI>	Process the source data a block at a time, using <B>R_SealUpdate</B>.
+</LI>
+<LI>	&quot;Close&quot; the envelope using <B>R_SealFinal</B>, and clear the
+encryption context.
+<A NAME="_Toc348263374"></A></LI></OL>
+<H2>
+<A NAME="RTFToC58">Opening digital envelopes</A>
+</H2>
+<P>The procedure for &quot;opening&quot; a digital envelope is as follows:
+</P>
+<OL>
+<LI>	Initialise a new envelope context using <B>R_OpenInit</B>. This decrypts
+the session key using the recipient's private key, and sets up the context ready
+for decryption of the main message.
+</LI>
+<LI>	Process the encrypted data a block at a time using <B>R_OpenUpdate</B>.
+</LI>
+<LI>	Process the final encrypted data block using <B>R_OpenFinal</B>, which
+also removes any padding data.
+<A NAME="_Toc348263375"></A></LI></OL>
+<H2>
+<A NAME="RTFToC59">Functions</A><A NAME="R_SealInit"></A><A
+NAME="_Toc348263376"></A></H2>
+<H3>
+<A NAME="RTFToC60">R_SealInit</A></H3>
+<P><CODE>int R_SealInit(context, encryptedKeys, encryptedKeyLens, iv,
+publicKeyCount,<BR>               publicKeys, encryptionAlgorithm, randomStruct<BR>R_ENVELOPE_CTX
+*context;	/* new context */<BR>unsigned char **encryptedKeys;	/* encrypted keys
+*/<BR>unsigned int *encryptedKeyLens;	/* lengths of encrypted keys */<BR>unsigned
+char iv[8];	/* initialization vector */<BR>unsigned int publicKeyCount;	/*
+number of public keys */<BR>R_RSA_PUBLIC_KEY **publicKeys;	/* public keys */<BR>int
+encryptionAlgorithm;	/* data encryption algorithm */<BR>R_RANDOM_STRUCT
+*randomStruct;	/* random structure */</CODE></P>
+<P>
+Initialises an envelope sealing operation.  <B>context</B> points to an
+allocated blank R_ENVELOPE_CTX structure and <B>randomStruct</B> points to a
+pre-initialised R_RANDOM_STRUCT.  <B>encryptionAlgorithm</B> indicates which
+method of secret encryption is required (EA_DES_CBC, EA_DES_EDE2_CBC,
+EA_DES_EDE3_CBC or EA_DESX_CBC).</P>
+<P>
+<B>R_SealInit</B> uses the <B>random</B> structure to generate a session key
+and initialisation vector for the secret-key encryption (DES in CBC mode
+requires a 64-bit initialisation vector).</P>
+<P>
+The public keys of the intended recipients are placed in the <B>publicKeys</B>
+array, with the total number of public keys indicated by <B>publicKeyCount</B>
+(at least one public key must be supplied).  An invalid public key results in an
+RE_PUBLIC_KEY error, and no further keys will be processed.</P>
+<P>
+On success, returns zero, the <B>encryptedKeys</B> array contains the
+public-key encrypted session key (for each supplied public key) and
+<B>encryptedKeyLens</B> contains the respective encrypted key lengths.
+<B>iv</B> contains the DES initialisation vector.</P>
+<P>
+On error, returns RE_NEED_RANDOM if <B>randomStruct</B> has not been
+initialised, RE_PUBLIC_KEY if an invalid public key has been supplied or
+RE_ENCRYPTION_ALGORITHM if an invalid encryption algorithm has been selected.
+<A NAME="R_SealUpdate"></A><A NAME="_Toc348263377">
+</A></P>
+<H3>
+<A NAME="RTFToC61">R_SealUpdate</A></H3>
+<P><CODE>int R_SealUpdate (context, partOut, partOutLen, partIn, partInLen)<BR>R_ENVELOPE_CTX
+*context;	/* context */<BR>unsigned char *partOut; /* next encrypted data part
+*/<BR>unsigned int *partOutLen;	/* length of next encrypted data part */<BR>unsigned
+char *partIn;	/* next data part */<BR>unsigned int partInLen;	/* length of next
+data part */</CODE></P>
+<P>
+Continues a sealing operation, encrypting a block of data using the supplied
+context.  <B>context</B> is a R_ENVELOPE_CTX structure which has been
+successfully initialised using <B>R_SealInit</B>.  <B>partInLen</B> bytes of
+<B>partIn</B> are encrypted and returned in <B>partOut</B>.  Due to data
+padding, some expansion may occur, and <B>partOut</B> should be at least eight
+bytes larger than <B>partIn</B>.</P>
+<P>
+Always returns IDOK.
+<A NAME="R_SealFinal"></A><A NAME="_Toc348263378">
+</A></P>
+<H3>
+<A NAME="RTFToC62">R_SealFinal</A></H3>
+<P><CODE>int R_SealFinal(context, partOut, partOutLen)<BR>R_ENVELOPE_CTX
+*context; /* context */<BR>unsigned char *partOut;	/* last encrypted data part
+*/<BR>unsigned int *partOutLen;	/* length of last encrypted data part */</CODE></P>
+<P>
+Finalises a sealing operation, flushing the context buffer and resetting the
+context (to allow further use of the session key if required).  <B>context</B>
+is the R_ENVELOPE_CTX structure in use for the current sealing operation. On
+exit, <B>partOut</B> contains <B>partOutLen</B> bytes to be appended to the
+encrypted data (the contents of the context buffer).  <B>partOutLen</B> will be
+no more than eight.  Always returns IDOK.</P>
+<P>
+Note that although the context is restarted, sensitive information is not
+cleared.  If the context is no longer required, it is the caller's
+responsibility to clear it for security.
+<A NAME="R_OpenInit"></A><A NAME="_Toc348263379">
+</A></P>
+<H3>
+<A NAME="RTFToC63">R_OpenInit</A></H3>
+<P><CODE>int R_OpenInit(context, encryptionAlgorithm, encryptedKey,
+encryptedKeyLen, iv,<BR>               privateKey)<BR>R_ENVELOPE_CTX *context;
+/* new context */<BR>int encryptionAlgorithm;	/* data encryption algorithm */<BR>unsigned
+char *encryptedKey;	/* encrypted data encryption key */<BR>unsigned int
+encryptedKeyLen;	/* length of encrypted key */<BR>unsigned char iv[8];	/*
+initialization vector */<BR>R_RSA_PRIVATE_KEY *privateKey;	/* recipient's RSA
+private key */</CODE></P>
+<P>
+Initialises an envelope context ready for an &quot;opening&quot; (decryption)
+operation. The encrypted session key is decrypted using <B>privateKey</B>, and
+placed in the context.  The context is then initialised with the initialisation
+vector (supplied unencrypted &quot;in&quot; the envelope, and passed to <B>R_OpenInit</B>
+as
+<B>iv</B>), ready for decryption.  <B>encryptionAlgorithm</B> indicates the
+encryption algorithm to be used.</P>
+<P>
+On success, returns zero.  On error, returns RE_LEN if <B>encryptedKey</B> is
+too long (<B>encryptedKeyLen</B> &gt; MAX_ENCRYPTED_KEY_LEN), RE_PRIVATE_KEY if
+the private key is invalid (<I>i.e.</I> the correct session key cannot be
+retrieved) or RE_ENCRYPTION_ALGORITHM if an invalid encryption algorithm is
+selected.
+<A NAME="R_OpenUpdate"></A><A NAME="_Toc348263380">
+</A></P>
+<H3>
+<A NAME="RTFToC64">R_OpenUpdate</A></H3>
+<P><CODE>int R_OpenUpdate(context, partOut, partOutLen, partIn, partInLen)<BR>R_ENVELOPE_CTX
+*context;	/* context */<BR>unsigned char *partOut; /* next recovered data part
+*/<BR>unsigned int *partOutLen;	/* length of next recovered data part */<BR>unsigned
+char *partIn;	/* next encrypted data part */<BR>unsigned int partInLen;	/*
+length of next encrypted data part */</CODE></P>
+<P>
+Continues an opening operation, decrypting a block of data using the supplied
+context.  <B>context</B> is a R_ENVELOPE_CTX structure which has been
+successfully initialised using <B>R_OpenInit</B>.  <B>partInLen</B> bytes of
+<B>partIn</B> are decrypted and returned in <B>partOut</B>.  Due to data
+padding, some expansion may occur, and <B>partOut</B> should be at least eight
+bytes larger than <B>partIn</B>.</P>
+<P>
+Always returns IDOK.
+<A NAME="R_OpenFinal"></A><A NAME="_Toc348263381">
+</A></P>
+<H3>
+<A NAME="RTFToC65">R_OpenFinal</A></H3>
+<P><CODE>int R_OpenFinal(context, partOut, partOutLen)<BR>R_ENVELOPE_CTX
+*context; /* context */<BR>unsigned char *partOut;	/* last recovered data part
+*/<BR>unsigned int *partOutLen;	/* length of last recovered data part */</CODE></P>
+<P>
+Finalises an opening operation, flushing the context buffer and re-initialising
+the context.  <B>context</B> is the R_ENVELOPE_CTX structure in use for the
+current opening operation.</P>
+<P>
+On success, returns zero and <B>partOut</B> contains <B>partOutLen</B> bytes
+to be appended to the decrypted data (the contents of the context buffer).
+<B>partOutLen</B> will be no more than eight.  On error, returns RE_KEY if the
+session key is invalid.</P>
+<P>
+Note that although the context is restarted, sensitive information is not
+cleared.  If the context is no longer required, it is the caller's
+responsibility to clear it for security.
+<A NAME="_Toc348263382">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC66">PEM FUNCTIONS</A>
+<A NAME="_Toc348263383"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC67">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC68">Functions</A><OL>
+<LI><A HREF="#RTFToC69">R_EncodePEMBlock</A>
+</LI>
+<LI><A HREF="#RTFToC70">R_DecodePEMBlock</A>
+</LI>
+<LI><A HREF="#RTFToC71">R_SignPEMBlock</A>
+</LI>
+<LI><A HREF="#RTFToC72">R_VerifyPEMSignature</A>
+</LI>
+<LI><A HREF="#RTFToC73">R_SealPEMBlock</A>
+</LI>
+<LI><A HREF="#RTFToC74">R_OpenPEMBlock</A>
+</LI>
+<LI><A HREF="#RTFToC75">R_EncryptOpenPEMBlock</A>
+</LI>
+<LI><A HREF="#RTFToC76">R_DecryptOpenPEMBlock</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC67">Introduction</A></H2>
+<P>RSAEURO provides a number functions to process data in Privacy Enhanced Mail
+(PEM) format, ASCII-encoded according to RFC 1421.  In addition to simple
+encoding and decoding functions, PEM &quot;versions&quot; of several other
+functions are also provided.  The following list of PEM functions provides brief
+details, and the function descriptions which follow provide more detailed
+information. 
+</P>
+<UL><LI><B>R_EncodePEMBlock</B>  Encodes data into ASCII according to RFC
+1421.</LI>
+<LI><B>R_DecodePEMBlock</B>  Decodes data in RFC 1421 format into &quot;raw&quot;
+data.</LI>
+<LI><B>R_SignPEMBlock</B>  Produces an RFC 1421 encoded signature of a data
+block, optionally RFC 1421 encoding the data following signature generation.</LI>
+<LI><B>R_VerifyPEMSignature</B>  Verifies an RFC 1421 encoded signature,
+optionally decoding the content prior to signature generation.</LI>
+<LI><B>R_SealPEMBlock</B>  Signs and seals a block of data in and RFC 1421
+encoded &quot;envelope&quot;, using single-key DES CBC. Only supports single
+recipients.</LI>
+<LI><B>R_OpenPEMBlock</B>  &quot;Opens&quot; an RFC 1421 encoded &quot;envelope&quot;,
+verifying the signature and decrypting the data.</LI>
+<LI><B>R_EncryptOpenPEMBlock</B>  Encrypts a data block, returning encrypted
+RFC 1421 encoded data.</LI>
+<LI><B>R_DecryptOpenPEMBlock</B>  Decrypts and decodes an encrypted, RFC 1421
+encoded data block. </LI></UL>
+<P>Throughout this section, any reference to &quot;ASCII encoded&quot; should
+be read as &quot;ASCII encoded according to RFC 1421&quot;, and so on.
+<A NAME="_Toc348263384">
+</A></P>
+<H2>
+<A NAME="RTFToC68">Functions</A><A NAME="R_EncodePEMBlock"></A><A
+NAME="_Toc348263385"></A></H2>
+<H3>
+<A NAME="RTFToC69">R_EncodePEMBlock</A></H3>
+<P><CODE>int R_EncodePEMBlock(encodedBlock, encodedBlockLen, block, blockLen)<BR>unsigned
+char *encodedBlock;	/* encoded block */<BR>unsigned int *encodedBlockLen;	/*
+length of encoded block */<BR>unsigned char *block;	/* block */<BR>unsigned
+int blockLen;	/* length of block */</CODE></P>
+<P>
+Encodes a block of binary data into ASCII for transmission through 7-bit
+channels such as Internet electronic mail.  <B>blockLen</B> bytes of
+<B>block</B> are encoded and returned in <B>encodedBlock</B>, of length
+<B>encodedBlock</B> (in bytes).</P>
+<P>
+Data expansion occurs as four ASCII characters are used to encode three data
+bytes.  Therefore, the <B>encodedBlock</B> buffer should be allocated at least
+33% larger than <B>block</B>.</P>
+<P>
+Always returns IDOK.
+<A NAME="R_DecodePEMBlock"></A><A NAME="_Toc348263386">
+</A></P>
+<H3>
+<A NAME="RTFToC70">R_DecodePEMBlock</A></H3>
+<P><CODE>int R_DecodePEMBlock (outbuf, outlength, inbuf, inlength)<BR>unsigned
+char *outbuf;	/* block */<BR>unsigned int *outlength;	/* length of block */<BR>unsigned
+char *inbuf;	/* encoded block */<BR>unsigned int inlength;	/* length of encoded
+block */</CODE></P>
+<P>
+Decodes a block of ASCII into binary data.  <B>Inbuf</B> holds the input data,
+<B>inlength</B> indicates the number of ASCII bytes to process, and therefore
+must be an integer multiple of four.</P>
+<P>
+On success, returns IDOK and <B>outbuf</B> contains <B>outlength</B> bytes of
+decoded data.  On error, returns RE_ENCODING in the event of an encoding error
+(or if <B>inlength</B> is not an integer multiple of four).
+<A NAME="R_SignPEMBlock"></A><A NAME="_Toc348263387">
+</A></P>
+<H3>
+<A NAME="RTFToC71">R_SignPEMBlock</A></H3>
+<P><CODE>int R_SignPEMBlock( encodedContent, encodedContentLen,
+encodedSignature,<BR>                    encodedSignatureLen, content,
+contentLen, recode, digestAlgorithm,<BR> privateKey)<BR>unsigned char
+*encodedContent;	/* encoded content */<BR>unsigned int *encodedContentLen;	/*
+length of encoded content */<BR>unsigned char *encodedSignature; 	/* encoded
+signature */<BR>unsigned int *encodedSignatureLen;	/* length of encoded
+signature */<BR>unsigned char *content;	/* content */<BR>unsigned int
+contentLen;	/* length of content */<BR>int recode;	/* recoding flag */<BR>int
+digestAlgorithm;	/* digest algorithm */<BR>R_RSA_PRIVATE_KEY *privateKey;	/*
+signer's RSA private key */</CODE></P>
+<P>
+Produces a digital signature of the supplied data, and returns a ASCII-encoded
+version of the signature.  Optionally ASCII-encodes the data block.</P>
+<P>
+<B>Content</B> contains the data to be signed, <B>contentLen</B> indicates the
+length of the data.  <B>digestAlgorithm</B> indicates the message digest
+algorithm to use, <B>privateKey</B> is the signer's RSA private key, used to
+encrypt the digest to produce a signature.</P>
+<P>
+If <B>recode</B> is TRUE, the data block (<B>content</B>) is ASCII encoded
+following the message digest generation, and the encoded data is returned in
+<B>encodedContent</B>, and its length is returned in
+<B>encodedContentLen</B>.</P>
+<P>
+On success, returns IDOK, <B>encodedSignature</B> contains the ASCII encoded
+signature and <B>encodedSignatureLen</B> indicates the length of the encoded
+signature.  On error, returns RE_DIGEST_ALGORITHM if an invalid digest algorithm
+is specified or RE_PRIVATE_KEY if the private key is invalid.
+<A NAME="R_VerifyPEMSignature"></A><A NAME="_Toc348263388">
+</A></P>
+<H3>
+<A NAME="RTFToC72">R_VerifyPEMSignature</A></H3>
+<P><CODE>int R_VerifyPEMSignature( content, contentLen, encodedContent,
+encodedContentLen,<BR>                          encodedSignature,
+encodedSignatureLen, recode, <BR>                          digestAlgorithm,
+publicKey)<BR>unsigned char *content;	/* content */<BR>unsigned int
+*contentLen;	/* length of content */<BR>unsigned char *encodedContent;	/*
+(possibly) encoded content */<BR>unsigned int encodedContentLen;	/* length of
+encoded content */<BR>unsigned char *encodedSignature;	/* encoded signature */<BR>unsigned
+int encodedSignatureLen;	/* length of encoded signature */<BR>int recode;	/*
+recoding flag */<BR>int digestAlgorithm;	/* digest algorithm */<BR>R_RSA_PUBLIC_KEY
+*publicKey;	/* signer's public key */</CODE></P>
+<P>
+Decodes and verifies an ASCII-encoded signature.  Optionally decodes the data
+block prior to message digest generation and verification.</P>
+<P>
+<B>content</B> contains the data against which the signature is to be verified,
+<B>contentLen</B> indicates the length of the data.  If <B>recode</B> is TRUE,
+<B>encodedContent</B> (<B>encodedContentLen</B> bytes long) is decoded into
+<B>content</B> prior to signature verification.</P>
+<P>
+<B>publicKey</B> is used to decrypt the signature, and the resulting message
+digest is compared with the digest generated from <B>content</B> using the
+digest algorithm indicated by <B>digestAlgorithm</B> (it is the caller's
+responsibility to identify the appropriate digest algorithm).</P>
+<P>
+Returns zero for success (the digests match), RE_SIGNATURE_ENCODING if the
+signature cannot be decoded correctly, RE_CONTENT_ENCODING if the content cannot
+be decoded correctly, RE_LEN if the signature length is invalid,
+RE_DIGEST_ALGORITHM if an invalid digest algorithm is selected, RE_PUBLIC_KEY if
+the supplied public key is invalid or RE_SIGNATURE if the signature is incorrect
+(<I>i.e.</I> the digests do not match).
+<A NAME="R_SealPEMBlock"></A><A NAME="_Toc348263389">
+</A></P>
+<H3>
+<A NAME="RTFToC73">R_SealPEMBlock</A></H3>
+<P><CODE>int R_SealPEMBlock( encryptedContent, encryptedContentLen,
+encryptedKey,
+<BR>                    encryptedKeyLen, encryptedSignature,
+encryptedSignatureLen, iv,<BR>                    content, contentLen,
+digestAlgorithm, publicKey, privateKey,<BR> randomStruct)<BR>unsigned char
+*encryptedContent;	/* encoded, encrypted content */<BR>unsigned int
+*encryptedContentLen;	/* length */<BR>unsigned char *encryptedKey;	/* encoded,
+encrypted key */<BR>unsigned int *encryptedKeyLen; /* length */<BR>unsigned
+char *encryptedSignature;	/* encoded, encrypted signature */<BR>unsigned int
+*encryptedSignatureLen;	/* length */<BR>unsigned char iv[8];	/* DES
+initialization vector */<BR>unsigned char *content;	/* content */<BR>unsigned
+int contentLen;	/* length of content */<BR>int digestAlgorithm;	/*
+message-digest algorithms */<BR>R_RSA_PUBLIC_KEY *publicKey; 	/* recipient's
+RSA public key */<BR>R_RSA_PRIVATE_KEY *privateKey; /* signer's RSA private key
+*/<BR>R_RANDOM_STRUCT *randomStruct;	/* random structure */</CODE></P>
+<P>
+Seals data in a digital envelope, with EA_DES_CBC encryption and digital
+signature, and returns PEM ASCII-encoded data.</P>
+<P>
+<B>content</B> contains the data to be sealed, <B>contentLen</B> indicates the
+length of the data.  A signature of <B>content</B> is produced using the digest
+algorithm indicated by <B>digestAlgorithm</B> and the sender's private key,
+<B>privateKey</B>. c<B>ontent</B> is then encrypted using EA_DES_CBC, with a
+random session key generated from <B>randomStruct</B> (it is the caller's
+responsibility to ensure that <B>randomStruct</B> has been initialised).</P>
+<P>
+On success, returns zero, <B>encryptedContent</B> contains
+<B>encryptedContentLen</B> bytes of ASCII encoded encrypted content,
+<B>encryptedKey</B> contains the ASCII encoded session key (encryptedKeyLen
+bytes long), encrypted with <B>publicKey</B>, and <B>encryptedSignature</B>
+contains the ASCII encoded signature.  All secret-key encryption is performed
+using EA_DES_CBC and the session key.</P>
+<P>
+It is the caller's responsibility to clear the context if it is no longer
+required.</P>
+<P>
+On error, returns RE_DIGEST_ALGORITHM if an invalid digest algorithm is
+selected, RE_PRIVATE_KEY if the private key is invalid, RE_PUBLIC_KEY if the
+public key is invalid or RE_NEED_RANDOM if the random structure is not
+initialised.
+<A NAME="R_OpenPEMBlock"></A><A NAME="_Toc348263390">
+</A></P>
+<H3>
+<A NAME="RTFToC74">R_OpenPEMBlock</A></H3>
+<P><CODE>int R_OpenPEMBlock( content, contentLen, encryptedContent, <BR>     
+   encryptedContentLen, encryptedKey, encryptedKeyLen, <BR>   
+encryptedSignature, encryptedSignatureLen, iv, <BR> digestAlgorithm,
+privateKey, publicKey)<BR>unsigned char *content;	/* content */<BR>unsigned
+int *contentLen;	/* length of content */<BR>unsigned char *encryptedContent;	/*
+encoded, encrypted content */<BR>unsigned int encryptedContentLen;	/* length */<BR>unsigned
+char *encryptedKey;	/* encoded, encrypted key */<BR>unsigned int
+encryptedKeyLen;	/* length */<BR>unsigned char *encryptedSignature;	/* encoded,
+encrypted signature */<BR>unsigned int encryptedSignatureLen;	/* length */<BR>unsigned
+char iv[8]; 	/* DES initialization vector */<BR>int digestAlgorithm;	/*
+message-digest algorithms */<BR>R_RSA_PRIVATE_KEY *privateKey;	/* recipient's
+RSA private key */<BR>R_RSA_PUBLIC_KEY *publicKey;	/* signer's RSA public key
+*/</CODE></P>
+<P>
+&quot;Opens&quot; a ASCII encoded digital envelope, verifies the signature,
+decodes and decrypts the content of the envelope.</P>
+<P>
+<B>encryptedContent</B> contains the encoded, encrypted content, and
+<B>encryptedContent</B> indicates its length in bytes.  The session key is
+retrieved from <B>encryptedKey</B> (<B>encryptedKeyLen</B> bytes long) using
+<B>publicKey</B>, then used to decrypt the <B>encryptedContent</B>.  Once the
+content has been decrypted, the signature is retrieved, decoded and verified
+against the content using the recipient's private key (<B>privateKey</B>) and
+the message digest algorithm indicated by <B>digestAlgorithm</B>.</P>
+<P>
+On success, returns zero and <B>content</B> contains <B>contentLen</B> bytes
+of plaintext data.</P>
+<P>
+On error, returns RE_KEY_ENCODING if the key cannot be decoded,
+RE_SIGNATURE_ENCODING if the signature cannot be decoded, RE_CONTENT_ENCODING if
+the content cannot be decoded, RE_LEN if the encrypted session key is too long,
+RE_PRIVATE_KEY if the private key is invalid, RE_KEY if the retrieved session
+key is invalid, RE_DIGEST_ALGORTIHM if an invalid digest algorithm is selected,
+RE_PUBLIC_KEY if the public key is invalid or RE_SIGNATURE if the signature is
+incorrect (<I>i.e.</I> the message digests do not match).
+<A NAME="R_EncryptOpenPEMBlock"></A><A NAME="_Toc348263391">
+</A></P>
+<H3>
+<A NAME="RTFToC75">R_EncryptOpenPEMBlock</A></H3>
+<P><CODE>int R_EncryptOpenPEMBlock(context, output, outputLen, input,
+inputLen)<BR>R_ENVELOPE_CTX *context;	/* context */<BR>unsigned char *output;
+/* encrypted, encoded block */<BR>unsigned int *outputLen;	/* length of output
+*/<BR>unsigned char *input;	/* block to encrypt */<BR>unsigned int
+inputLen;	/* length */</CODE></P>
+<P>
+Encrypts a block of data and returns the ciphertext in ASCII encoded format.
+<B>context</B> is the current envelope context, which must have been
+initialised correctly by the caller.  <B>inputLen</B> bytes from input are
+encrypted and encoded into ASCII, then returned in <B>output</B>.  On exit,
+<B>outputLen</B> may be up to 33% larger than <B>inputLen</B> (three source
+bytes become four output bytes), so <B>output</B> should be allocated to
+account for the data expansion.  Always returns IDOK.
+<A NAME="R_DecryptOpenPEMBlock"></A><A NAME="_Toc348263392">
+</A></P>
+<H3>
+<A NAME="RTFToC76">R_DecryptOpenPEMBlock</A></H3>
+<P><CODE>int R_DecryptOpenPEMBlock(context, output, outputLen, input,
+inputLen)<BR>R_ENVELOPE_CTX *context;	/* context */<BR>unsigned char *output;
+/* decoded, decrypted block */<BR>unsigned int *outputLen;	/* length of output
+*/<BR>unsigned char *input;	/* encrypted, encoded block */<BR>unsigned int
+inputLen;	/* length */</CODE></P>
+<P>
+Decrypts a block of ASCII encoded ciphertext and returns the plaintext in
+<B>output</B>.  <B>context </B>is the current envelope context, which must
+have been initialised correctly by the caller.  <B>inputLen</B> bytes from
+<B>input</B> are decoded, decrypted, then returned in <B>output</B>.  Always
+returns IDOK.
+<A NAME="_Toc348263393">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC77">KEY GENERATION AND EXCHANGE</A>
+<A NAME="_Toc348263394"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC78">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC79">RSA Key Generation</A>
+</LI>
+<LI><A HREF="#RTFToC80">Diffie-Hellman key agreement</A>
+</LI>
+<LI><A HREF="#RTFToC81">Functions</A><OL>
+<LI><A HREF="#RTFToC82">R_GeneratePEMKeys</A>
+</LI>
+<LI><A HREF="#RTFToC83">R_GenerateDHParams</A>
+</LI>
+<LI><A HREF="#RTFToC84">R_SetupDHAgreement</A>
+</LI>
+<LI><A HREF="#RTFToC85">R_ComputeDHAgreedKey</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC78">Introduction</A></H2>
+<P>RSAEURO contains functions for the generation of RSA key pairs, and for the
+exchange of keys using the Diffie-Hellman agreement protocol.  This section
+describes these functions and their use.
+<A NAME="_Toc348263395">
+</A></P>
+<H2>
+<A NAME="RTFToC79">RSA Key Generation</A>
+</H2>
+<P>A single function, <B>R_GeneratePEMKeys</B>, provides RSA key generation
+for RSAEURO.  A &quot;prototype key&quot; is passed to the function, indicating
+the length of the modulus in bits and the public exponent.  Two values are
+supported for the public exponent: 3 or &quot;Fermat 4&quot; (65537).  A
+pre-initialised random structure is required for key generation.
+<A NAME="_Toc348263396">
+</A></P>
+<H2>
+<A NAME="RTFToC80">Diffie-Hellman key agreement</A>
+</H2>
+<P>Diffie-Hellman key agreement provides a method for exchanging session keys
+without using RSA.  Diffie-Hellman gains its security form the difficulty of
+calculating discrete logarithms in a finite field.  The procedure for generating
+a session key using Diffie-Hellman is as follows:
+</P>
+<OL>
+<LI>	The Diffie-Hellman parameters are generated using
+<B>R_GenerateDHParams</B>, and passed to the relevant parties (this exchange
+can take place over an insecure communications path, as knowledge of the
+Diffie-Hellman parameters does not assist an attacker).
+</LI>
+<LI>	The two parties wishing to communicate each generate public and private
+values using <B>R_SetupDHAgreement</B>, using the agreed on parameters.
+</LI>
+<LI>	Both parties exchange public values, and compute the session key using
+<B>R_ComputeDHAgreedKey</B>.
+<A NAME="_Toc348263397"></A></LI></OL>
+<H2>
+<A NAME="RTFToC81">Functions</A><A NAME="R_GeneratePEMKeys"></A><A
+NAME="_Toc348263398"></A></H2>
+<H3>
+<A NAME="RTFToC82">R_GeneratePEMKeys</A></H3>
+<P><CODE>int R_GeneratePEMKeys(publicKey, privateKey, protoKey, randomStruct)<BR>R_RSA_PUBLIC_KEY
+*publicKey;	/* new RSA public key */<BR>R_RSA_PRIVATE_KEY *privateKey;	/* new
+RSA private key */<BR>R_RSA_PROTO_KEY *protoKey;	/* RSA prototype key */<BR>R_RANDOM_STRUCT
+*randomStruct;	/* random structure */</CODE></P>
+<P>
+Generates an RSA public/private key pair, based on the supplied prototype key.</P>
+<P>
+On success, returns zero, with the new public and private keys returned in
+<B>publicKey</B> and <B>privateKey</B>.</P>
+<P>
+On error, returns RE_MODULUS_LEN if the modulus length specified in
+<B>protoKey</B> is invalid (either less than MIN_RSA_MODULUS_BITS or greater
+than MAX_RSA_MODULUS_BITS), RE_NEED_RANDOM if <B>randomStruct</B> has not been
+initialised or RE_DATA if a problem occurred generating primes.
+<A NAME="R_GenerateDHParams"></A><A NAME="_Toc348263399">
+</A></P>
+<H3>
+<A NAME="RTFToC83">R_GenerateDHParams</A></H3>
+<P><CODE>int R_GenerateDHParams(params, primeBits, subPrimeBits, randomStruct)<BR>R_DH_PARAMS
+*params;	/* new Diffie-Hellman parameters */<BR>unsigned int primeBits;	/*
+length of prime in bits */<BR>unsigned int subPrimeBits;	/* length of subprime
+in bits */<BR>R_RANDOM_STRUCT *randomStruct;	/* random structure */</CODE></P>
+<P>
+Generates a set of Diffie-Hellman parameters (prime/modulus and generator).
+<B>primeBits</B> indicates the length of the prime required (in bits), and
+<B>subPrimeBits</B> indicates the length of a prime &quot;q&quot; that divides
+p-1.  The resulting Diffie-Hellman &quot;generator&quot; is of order q.  <B>randomStruct</B>
+points to an initialised random structure.</P>
+<P>
+It is the caller's responsibility to use sensible values for <B>primeBits</B>;
+there are no sanity checks.</P>
+<P>
+On success, returns zero, and the Diffie-Hellman parameters in params.</P>
+<P>
+On error, returns RE_NEED_RANDOM if <B>randomStruct</B> has not been
+initialised or RE_DATA if a problem occurred generating primes.
+<A NAME="R_SetupDHAgreement"></A><A NAME="_Toc348263400">
+</A></P>
+<H3>
+<A NAME="RTFToC84">R_SetupDHAgreement</A></H3>
+<P><CODE>int R_SetupDHAgreement(publicValue, privateValue, privateValueLen,
+params, <BR>                       randomStruct)<BR>unsigned char
+*publicValue; /* new public value */<BR>unsigned char *privateValue;	/* new
+private value */<BR>unsigned int privateValueLen;	/* length of private value */<BR>R_DH_PARAMS
+*params;	/* Diffie-Hellman parameters */<BR>R_RANDOM_STRUCT *randomStruct;	/*
+random structure */</CODE></P>
+<P>
+Generates a set of public and private Diffie-Hellman values, using the supplied
+prime and generator (from params).</P>
+<P>
+<B>params</B> is a previously initialised R_DH_PARAMS structure,
+<B>randomStruct</B> points to an initialised random structure.
+<B>privateValueLen</B> indicates the length of the required private value in
+bytes (typically, the same size as the subPrimeBits value supplied to
+<B>R_GenerateDHParameters</B>).</P>
+<P>
+On success, returns IDOK, with the Diffie-Hellman private and public values in
+<B>privateValue</B> and <B>publicValue</B> respectively (<B>publicValue</B>
+is the same length as <B>params-&gt;prime</B>).</P>
+<P>
+On error, returns RE_NEED_RANDOM if <B>randomStruct</B> has not been
+initialised or RE_DATA if a problem occurred generating primes.
+<A NAME="R_ComputeDHAgreedKey"></A><A NAME="_Toc348263401">
+</A></P>
+<H3>
+<A NAME="RTFToC85">R_ComputeDHAgreedKey</A></H3>
+<P><CODE>int R_ComputeDHAgreedKey(agreedKey, otherPublicValue, privateValue,
+<BR>                       privateValueLen, params)<BR>unsigned char
+*agreedKey;	/* new agreed key */<BR>unsigned char *otherPublicValue;	/* other's
+public value */<BR>unsigned char *privateValue;	/* private value */<BR>unsigned
+int privateValueLen;	/* length of private value */<BR>R_DH_PARAMS *params;	/*
+Diffie-Hellman parameters */</CODE></P>
+<P>
+Computes a session key from supplied Diffie-Hellman parameters.</P>
+<P>
+<B>params</B> is a previously initialised R_DH_PARAMS structure,
+<B>randomStruct</B> points to an initialised <B>random</B> structure.
+<B>privateValue</B> points to the caller's Diffie-Hellman private value (<B>privateValueLen</B>
+bytes long). <B>OtherPublicValue</B> points to the other party's Diffie-Hellman
+public value (which is <B>params-&gt;primeLen
+</B>long).</P>
+<P>
+On success, returns IDOK, with the generated session key in <B>agreedKey</B> (<B>params-&gt;primeLen
+bytes </B>long).</P>
+<P>
+On error, returns RE_DATA for a mathematical error (such as incorrect public
+values or invalid <B>params</B> structure).
+<A NAME="_Toc348263402">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC86">RSA</A><A NAME="_Toc348263403"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC87">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC88">Functions</A><OL>
+<LI><A HREF="#RTFToC89">RSAPrivateEncrypt</A>
+</LI>
+<LI><A HREF="#RTFToC90">RSAPrivateDecrypt</A>
+</LI>
+<LI><A HREF="#RTFToC91">RSAPublicEncrypt</A>
+</LI>
+<LI><A HREF="#RTFToC92">RSAPublicDecrypt</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC87">Introduction</A></H2>
+<P>This section describes the RSA processing routines provided by RSAEURO for
+RSA encryption and decryption.  The RSA functions are listed below: 
+</P>
+<UL><LI><B>RSAPrivateEncrypt</B>  Encrypts a block of data using an RSA
+private key, according to PKCS#1: RSA Encryption Standard.</LI>
+<LI>
+<B>RSAPrivateDecrypt</B>  Decrypts a block of data using an RSA private key,
+according to PKCS#1: RSA Encryption Standard.</LI>
+<LI><B>RSAPublicEncrypt</B>  Encrypts a block of data using an RSA public key,
+according to PKCS#1: RSA Encryption Standard.</LI>
+<LI><B>RSAPublicDecrypt</B>  Decrypts a block of data using an RSA public key,
+according to PKCS#1: RSA Encryption Standard.</LI></UL>
+<HR ALIGN="CENTER" NOSHADE="NOSHADE">
+<P><B>NOTE</B>:  Paul Kocher recently published a timing-based attack which
+could be used against RSA encryption providing the attacker has access to the
+machine performing the encryption - this is <B>not</B> usually the case with
+email encryption.  Future versions of RSAEURO will incorporate protection
+against such attacks.  For further details, see the preliminary draft of the
+paper, available on the Internet at <A HREF="http://www.cryptography.com/">http://www.cryptography.com</A>
+and RSADSI's response at <A HREF="http://www.rsa.com/">http://www.rsa.com</A>.
+<A NAME="_Toc348263404">
+</A></P>
+<HR ALIGN="CENTER" NOSHADE="NOSHADE">
+<H2>
+<A NAME="RTFToC88">Functions</A><A NAME="RSAPrivateEncrypt"></A><A
+NAME="_Toc348263405"></A></H2>
+<H3>
+<A NAME="RTFToC89">RSAPrivateEncrypt</A></H3>
+<P><CODE>int RSAPrivateEncrypt(output, outputLen, input, inputLen, privateKey)<BR>unsigned
+char *output;	/* output block */<BR>unsigned int *outputLen;	/* length of
+output block */<BR>unsigned char *input;	/* input block */<BR>unsigned int
+inputLen;	/* length of input block */<BR>R_RSA_PRIVATE_KEY *privateKey;	/* RSA
+private key */</CODE></P>
+<P>
+Performs a PKCS#1-compliant RSA private-key encryption.  <B>inputLen</B> bytes
+from <B>input</B> are encrypted using <B>privateKey</B>, and the result
+returned in <B>ouput</B>, <B>outputLen</B> bytes long.  <B>output</B> should
+be large enough to hold the result of the calculation, which will be one byte
+longer than the private key (<I>i.e.</I> not larger than MAX_RSA_MODULUS_LEN +
+1).  <B>inputLen</B> must be at least eleven bytes smaller than the modulus
+size (the additional eleven bytes are required for PKCS#1 encoding).  </P>
+<P>
+On exit, <B>outputLen</B> bytes of encrypted data are  returned in
+<B>output</B>.  Returns RE_LEN if the input block is too large for the supplied
+key, IDOK otherwise.
+<A NAME="RSAPrivateDecrypt"></A><A NAME="_Toc348263406">
+</A></P>
+<H3>
+<A NAME="RTFToC90">RSAPrivateDecrypt</A></H3>
+<P><CODE>int RSAPrivateDecrypt(output, outputLen, input, inputLen, privateKey)<BR>unsigned
+char *output;	/* output block */<BR>unsigned int *outputLen; 	 /* length of
+output block *<BR>unsigned char *input;	 /* input block */<BR>unsigned int
+inputLen; 	/* length of input block */<BR>R_RSA_PRIVATE_KEY *privateKey;	/* RSA
+private key */</CODE></P>
+<P>
+Performs an RSA private-key decryption of a PKCS#1-compliant input block.
+<B>inputLen </B>bytes from <B>input </B>are decrypted using <B>privateKey</B>,
+and the result returned in <B>output</B>, <B>outputLen</B> bytes long.
+<B>outputLen</B> will be no larger  than MAX_RSA_MODULUS_LEN + 1.</P>
+<P>
+On exit, <B>outputLen</B> bytes of decrypted data are  returned in
+<B>output</B>. Returns RE_LEN if the input block size is incorrect for the
+supplied key, RE_DATA if the decrypted data is not a valid PKCS#1 data block,
+IDOK otherwise.
+<A NAME="RSAPublicDecrypt"></A><A NAME="_Toc348263407">
+</A></P>
+<H3>
+<A NAME="RTFToC91">RSAPublicEncrypt</A></H3>
+<P><CODE>int RSAPublicEncrypt(output, outputLen, input, inputLen, publicKey,<BR>
+                 randomStruct)<BR>unsigned char *output;	/* output block */<BR>unsigned
+int *outputLen;	/* length of output block */<BR>unsigned char *input;	/* input
+block */<BR>unsigned int inputLen;	/* length of input block */<BR>R_RSA_PUBLIC_KEY
+*publicKey;	/* RSA public key */<BR>R_RANDOM_STRUCT *randomStruct;	/* random
+structure */</CODE></P>
+<P>
+Performs a PKCS#1 compliant RSA public key encryption. <B>inputLen</B> bytes
+from <B>input</B> are encrypted using <B>publicKey</B>, and the result
+returned in <B>ouput</B>, <B>outputLen</B> bytes long.  <B>output</B> should
+be large enough to hold the result of the calculation, which will be one byte
+longer than the public key (<I>i.e.</I> not larger than MAX_RSA_MODULUS_LEN +
+1).
+<B>inputLen</B> must be at least eleven bytes smaller than the modulus size
+(the additional eleven bytes are required for PKCS#1 encoding).
+<B>randomStruct</B> must be an initialised random structure (random data is
+required for the PKCS#1 data block).</P>
+<P>
+On exit, <B>outputLen</B> bytes of encrypted data are returned in
+<B>output</B>. Returns RE_LEN if the input block size is incorrect for the
+supplied key, IDOK otherwise.</P>
+<P>
+<A NAME="RSAPublicEncrypt"></A><A NAME="_Toc348263408">
+</A></P>
+<H3>
+<A NAME="RTFToC92">RSAPublicDecrypt</A></H3>
+<P><CODE>int RSAPublicDecrypt(output, outputLen, input, inputLen, publicKey)<BR>unsigned
+char *output;	/* output block */<BR>unsigned int *outputLen;	/* length of
+output block */<BR>unsigned char *input; 	/* input block */<BR>unsigned int
+inputLen;	 /* length of input block */<BR>R_RSA_PUBLIC_KEY *publicKey;	/* RSA
+public key */</CODE></P>
+<P>
+Performs an RSA public-key decryption of a PKCS#1-compliant input block.
+<B>inputLen </B>bytes from <B>input </B>are decrypted using <B>publicKey</B>,
+and the result returned in <B>output</B>, <B>outputLen</B> bytes long.
+<B>outputLen</B> will be no larger  than MAX_RSA_MODULUS_LEN + 1.</P>
+<P>
+On exit, <B>outputLen</B> bytes of decrypted data are returned in
+<B>output</B>. Returns RE_LEN if the input block size is incorrect for the
+supplied key, RE_DATA if the decrypted data is not a valid PKCS#1 data block,
+IDOK otherwise.</P>
+<P>
+<A NAME="_Toc348263409">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC93">DES</A><A NAME="_Toc348263410"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC94">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC95">Functions</A><OL>
+<LI><A HREF="#RTFToC96">DES_CBCInit</A>
+</LI>
+<LI><A HREF="#RTFToC97">DES_CBCUpdate</A>
+</LI>
+<LI><A HREF="#RTFToC98">DES_CBCRestart</A>
+</LI>
+<LI><A HREF="#RTFToC99">DES3_CBCInit</A>
+</LI>
+<LI><A HREF="#RTFToC100">DES3_CBCRestart</A>
+</LI>
+<LI><A HREF="#RTFToC101">DES3_CBCUpdate </A>
+</LI>
+<LI><A HREF="#RTFToC102">DESX_CBCInit</A>
+</LI>
+<LI><A HREF="#RTFToC103">DESX_CBCRestart</A>
+</LI>
+<LI><A HREF="#RTFToC104">DESX_CBCUpdate </A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC94">Introduction</A></H2>
+<P>This section describes the core DES processing routines provided by RSAEURO
+for DES encryption and decryption in various modes of operation.</P>
+<P>
+RSAEURO supports three different DES modes: single-key DES in
+cipher-block-chaining (CBC) mode, three-key DES in CBC mode using &quot;encrypt-decrypt-encrypt&quot;
+and DESX, RSADSI's &quot;enhanced&quot; DES (CBC with an additional XOR with a
+secret value).  Dual-key DES is provided for envelope processing by using
+three-key DES with key1 equal to key3.</P>
+<P>
+DES support in each mode consists of three basic functions: <B>init</B>, which
+initialises the relevant structure and loads the key (as supplied to the
+<B>init</B> function); <B>update</B>, which processes a block of input data
+using an initialised context, either encrypting or decrypting, and
+<B>restart</B> which restarts a context, resetting the initialisation vector,
+allowing the re-use of the same key for further CBC operations.</P>
+<P>
+The context contains the key (in the form of subkeys) during the DES operation,
+and as such should be treated as sensitive data.  It is the caller's
+responsibility to clear the context once the DES operation is complete.</P>
+<P>
+<A NAME="_Toc348263411">
+</A></P>
+<H2>
+<A NAME="RTFToC95">Functions</A><A NAME="DES_CBCInit"></A><A
+NAME="_Ref340051298"></A><A NAME="_Toc348263412"></A></H2>
+<H3>
+<A NAME="RTFToC96">DES_CBCInit</A></H3>
+<P><CODE>void DES_CBCInit(context, key, iv, encrypt)<BR>DES_CBC_CTX
+*context;	/* context */<BR>unsigned char *key;	/* key */<BR>unsigned char
+*iv;	/* initializing vector */<BR>int encrypt;	/* encrypt flag (1 = encrypt, 0
+= decrypt) */</CODE></P>
+<P>
+Initialises a DES CBC context, loading the context with the subkeys.
+<B>context</B> is a blank DES_CBC_CTX structure, <B>key</B> is the DES key,
+<B>iv</B> is the initialising vector and <B>encrypt</B> is a flag indicating
+encryption or decryption (zero for decryption, any other value for encryption).
+Both <B>key</B> and <B>iv</B> are unsigned char arrays of eight bytes each.</P>
+<P>
+Note that on exit <B>context</B> contains the key supplied, and should be
+handled as security sensitive data.  It is the caller's responsibility to clear
+<B>context</B> once the encryption or decryption operation has been completed.</P>
+<P>
+<A NAME="DES_CBCUpdate"></A><A NAME="_Toc348263413"></A>
+</P>
+<H3>
+<A NAME="RTFToC97">DES_CBCUpdate</A></H3>
+<P><CODE>int DES_CBCUpdate(context, output, input, len)<BR>DES_CBC_CTX
+*context; /* context */<BR>unsigned char *output;	 /* output block */<BR>unsigned
+char *input;	 /* input block */<BR>unsigned int len;</CODE></P>
+<P>
+Continues a DES_CBC operation, encrypting <B>len</B> bytes from <B>input</B>
+using the supplied <B>context</B>, placing the results in <B>output</B>.
+<B>context</B> must be a DES_CBC_CTX structure which has been initialised using
+<B>DES_CBCInit</B>.  <B>len</B> must be a multiple of eight bytes.
+<B>output</B> must have at least <B>len </B>bytes available.</P>
+<P>
+On exit, <B>output</B> contains <B>len</B> bytes of encrypted data.  Returns
+RE_LEN if <B>len</B> is not an integer multiple of eight bytes, IDOK otherwise.
+<A NAME="DES_CBCRestart"></A><A NAME="_Toc348263414"></A>
+</P>
+<H3>
+<A NAME="RTFToC98">DES_CBCRestart</A></H3>
+<P><CODE>void DES_CBCRestart(context)<BR>DES_CBC_CTX *context;</CODE></P>
+<P>
+Restarts the supplied DES_CBC context, resetting the initialisation vector to
+the original value, allowing the use of the same context (and, consequently, the
+same DES key) on a new block of data.  Note that the key information is not
+cleared, so <B>context</B> should be handled as security sensitive data.</P>
+<P>
+<A NAME="DES3_CBCInit"></A><A NAME="_Toc348263415"></A>
+</P>
+<H3>
+<A NAME="RTFToC99">DES3_CBCInit</A></H3>
+<P><CODE>void DES3_CBCInit(context, key, iv, encrypt)<BR>DES3_CBC_CTX
+*context;	/* context */<BR>unsigned char *key;	/* key */<BR>unsigned char
+*iv;	/* initializing vector */<BR>int encrypt;	/* encrypt flag (1 = encrypt, 0
+= decrypt) */</CODE></P>
+<P>
+Initialises an Encrypt-Decrypt-Encrypt (EDE)  DES CBC context, loading the
+context with the subkeys from the three supplied DES keys.  <B>context</B> is a
+blank DES3_CBC_CTX structure, <B>key</B> is the DES key, <B>iv</B> is the
+initialising vector and <B>encrypt</B> is a flag indicating encryption or
+decryption (zero for decryption, any other value for encryption).  Both
+<B>key</B> and <B>iv</B> are unsigned byte arrays, of twenty-four and eight
+bytes respectively (the <B>key</B> array consists of the three DES keys
+concatenated).</P>
+<P>
+Note that on exit <B>context</B> contains the key supplied, and should be
+handled as security sensitive data.  It is the caller's responsibility to clear
+<B>context</B> once the encryption or decryption operation has been completed.
+<A NAME="DES3_CBCRestart"></A><A NAME="_Toc348263416"></A>
+</P>
+<H3>
+<A NAME="RTFToC100">DES3_CBCRestart</A></H3>
+<P><CODE>void DES3_CBCRestart (context)<BR>DES3_CBC_CTX *context; 	/* context
+*/</CODE></P>
+<P>
+Restarts the supplied DES3_CBC context, resetting the initialisation vector to
+the original value, allowing the use of the same context (and, consequently, the
+same DES key) on a new block of data.  Note that the key information is not
+cleared, so <B>context</B> should be handled as security sensitive data.
+<A NAME="DES3_CBCUpdate"></A><A NAME="_Toc348263417"></A>
+</P>
+<H3>
+<A NAME="RTFToC101">DES3_CBCUpdate</A>
+</H3>
+<P><CODE>int DES3_CBCUpdate(context, output, input, len)<BR>DES3_CBC_CTX
+*context; /* context */<BR>unsigned char *output;	/* output block */<BR>unsigned
+char *input;	/* input block */<BR>unsigned int len;	/* length of input and
+output blocks */</CODE></P>
+<P>
+Continues a DES3_CBC operation, encrypting <B>len</B> bytes from <B>input</B>
+using the supplied <B>context</B>, placing the results in <B>output</B>.
+<B>context</B> must be a DES3_CBC_CTX structure which has been initialised
+using <B>DES3_CBCInit</B>.  <B>len</B> must be a multiple of eight bytes.
+<B>output</B> must have at least <B>len </B>bytes available.</P>
+<P>
+On exit, <B>output</B> contains <B>len</B> bytes of encrypted data.  Returns
+RE_LEN if <B>len</B> is not an integer multiple of eight bytes, IDOK otherwise.
+<A NAME="DESX_CBCInit"></A><A NAME="_Toc348263418"></A>
+</P>
+<H3>
+<A NAME="RTFToC102">DESX_CBCInit</A></H3>
+<P><CODE>void DESX_CBCInit(context, key, iv, encrypt)<BR>DESX_CBC_CTX
+*context;	/* context */<BR>unsigned char *key;	/* DES key and whiteners */<BR>unsigned
+char *iv;	/* DES initializing vector */<BR>int encrypt;	/* encrypt flag (1 =
+encrypt, 0 = decrypt) */</CODE></P>
+<P>
+Initialises an DESX CBC context, loading the context with the subkeys and &quot;whiteners&quot;
+from the supplied key.  <B>context</B> is a blank DESX_CBC_CTX structure, <B>key</B>
+is the DESX key (the DES key, input whitener and output whitener concatenated),
+<B>iv</B> is the initialising vector and <B>encrypt</B> is a flag indicating
+encryption or decryption (zero for decryption, any other value for encryption). 
+Both <B>key</B> and <B>iv</B> are unsigned byte arrays, of twenty-four and
+eight bytes respectively (the <B>key</B> array consists of the three DES keys
+concatenated).</P>
+<P>
+Note that on exit <B>context</B> contains the key supplied, and should be
+handled as security sensitive data.  It is the caller's responsibility to clear
+<B>context</B> once the encryption or decryption operation has been completed.
+<A NAME="DESX_CBCRestart"></A><A NAME="_Toc348263419"></A>
+</P>
+<H3>
+<A NAME="RTFToC103">DESX_CBCRestart</A></H3>
+<P><CODE>void DESX_CBCRestart(context)<BR>DESX_CBC_CTX *context;	/* context
+*/</CODE></P>
+<P>
+Restarts the supplied DESX_CBC context, resetting the initialisation vector to
+the original value, allowing the use of the same context (and, consequently, the
+same DES key) on a new block of data.  Note that the key information is not
+cleared, so <B>context</B> should be handled as security sensitive data.
+<A NAME="DESX_CBCUpdate"></A><A NAME="_Toc348263420"></A>
+</P>
+<H3>
+<A NAME="RTFToC104">DESX_CBCUpdate</A>
+</H3>
+<P><CODE>int DESX_CBCUpdate (context, output, input, len)<BR>DESX_CBC_CTX
+*context;	/* context */<BR>unsigned char *output;	/* output block */<BR>unsigned
+char *input;	/* input block */<BR>unsigned int len;	/* length of input and
+output blocks */</CODE></P>
+<P>
+Continues a DESX_CBC operation, encrypting <B>len</B> bytes from <B>input</B>
+using the supplied <B>context</B>, placing the results in <B>output</B>.
+<B>context</B> must be a DESX_CBC_CTX structure which has been initialised
+using <B>DESX_CBCInit</B>.  <B>len</B> must be a multiple of eight bytes.
+<B>output</B> must have at least <B>len </B>bytes available.</P>
+<P>
+On exit, <B>output</B> contains <B>len</B> bytes of encrypted data.  Returns
+RE_LEN if <B>len</B> is not an integer multiple of eight bytes, IDOK otherwise.</P>
+<P>
+<A NAME="_Toc348263421"></A>
+</P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC105">NATURAL NUMBER ARITHMETIC</A>
+<A NAME="_Toc348263422"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC106">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC107">Representation of natural numbers</A>
+</LI>
+<LI><A HREF="#RTFToC108">Functions</A><OL>
+<LI><A HREF="#RTFToC109">NN_Decode</A>
+</LI>
+<LI><A HREF="#RTFToC110">NN_Encode</A>
+</LI>
+<LI><A HREF="#RTFToC111">NN_Assign</A>
+</LI>
+<LI><A HREF="#RTFToC112">NN_AssignZero</A>
+</LI>
+<LI><A HREF="#RTFToC113">NN_Assign2Exp</A>
+</LI>
+<LI><A HREF="#RTFToC114">NN_Add</A>
+</LI>
+<LI><A HREF="#RTFToC115">NN_Sub</A>
+</LI>
+<LI><A HREF="#RTFToC116">NN_Mult</A>
+</LI>
+<LI><A HREF="#RTFToC117">NN_LShift</A>
+</LI>
+<LI><A HREF="#RTFToC118">NN_RShift</A>
+</LI>
+<LI><A HREF="#RTFToC119">NN_Div</A>
+</LI>
+<LI><A HREF="#RTFToC120">NN_Mod</A>
+</LI>
+<LI><A HREF="#RTFToC121">NN_ModMult</A>
+</LI>
+<LI><A HREF="#RTFToC122">NN_ModExp</A>
+</LI>
+<LI><A HREF="#RTFToC123">NN_ModInv</A>
+</LI>
+<LI><A HREF="#RTFToC124">NN_Gcd</A>
+</LI>
+<LI><A HREF="#RTFToC125">NN_Cmp</A>
+</LI>
+<LI><A HREF="#RTFToC126">NN_Zero</A>
+</LI>
+<LI><A HREF="#RTFToC127">NN_Digits</A>
+</LI>
+<LI><A HREF="#RTFToC128">NN_Bits</A>
+</LI>
+<LI><A HREF="#RTFToC129">GeneratePrime</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC106">Introduction</A></H2>
+<P>This section describes the natural number arithmetic &quot;primitives&quot;
+used by various functions within RSAEURO.  The following table provides brief
+details, and the function descriptions which follow provide more detailed
+information. 
+</P>
+<UL><LI><B>NN_Decode(a, digits, b, len)</B>  Decodes a character array
+representation `a' into a &quot;raw&quot; value b</LI>
+<LI><B>NN_Encode(a, len, b, digits)</B>  Encodes a &quot;raw&quot; value a
+into a character array 'b'</LI>
+<LI><B>NN_Assign(a, b, digits)</B>  Assigns a = b</LI>
+<LI><B>NN_AssignZero(a, digits)</B>  Zeroises a</LI>
+<LI><B>NN_Assign2Exp(a, b, digits)</B>  Assigns a = 2 ** b</LI>
+<LI><B>NN_Add(a, b, c, digits)</B>  Computes a = b + c</LI>
+<LI><B>NN_Sub(a, b, c, digits)</B>  Computes a = b - c</LI>
+<LI><B>NN_Mult(a, b, c, digits)</B>  Computes a = b * c</LI>
+<LI>
+<B>NN_LShift(a, b, c, digits)</B>  Computes a = b * 2 ** c (i.e. shifts b left
+c bits, returning the result in a)</LI>
+<LI><B>NN_RShift(a, b, c, digits)</B> Computes a = b / 2 ** c (i.e. shifts b
+right c bits, returning the result in a)</LI>
+<LI><B>NN_Div(a, b, c, cDigits, d, dDigits</B>)  Computes a = c div d and b =
+c mod d</LI>
+<LI><B>NN_Mod(a, b, bDigits, c, cDigits)</B>  Computes a = b mod c</LI>
+<LI><B>NN_ModMult(a, b, c, d, digits)</B>  Computes a = b * c mod d</LI>
+<LI><B>NN_ModExp(a, b, c, cDigits, d, dDigits)</B>  Computes a = b ** c mod d</LI>
+<LI><B>NN_ModInv(a, b, c, digits)</B>  Computes a = 1/b mod c</LI>
+<LI><B>NN_Gcd(a, b, c, digits)</B>  Assigns a to the greatest common divisor
+of b and c</LI>
+<LI><B>NN_Cmp(a, b, digits)</B>  Returns the sign of a - b</LI>
+<LI><B>
+NN_Zero(a, digits)</B>  Returns 1 iff a = 0</LI>
+<LI><B>NN_Digits(a, digits)</B>  Returns the significant length of natural
+number a in digits</LI>
+<LI><B>NN_Bits(a, bits)</B>  Returns the significant length of the natural
+number a in bits</LI>
+<LI><B>NN_DigitBits (a)</B>  Returns the significant length of the digit a in
+bits</LI></UL>
+<PRE>
+                                                
+<A NAME="_Toc348263423">
+</A></PRE>
+<H2>
+<A NAME="RTFToC107">Representation of natural numbers</A>
+</H2>
+<P>Natural numbers are represented internally in RSAEURO as arbitrary-length
+NN_DIGIT arrays, where the NN_DIGIT type is by default an unsigned 32-bit value
+(UINT4).  The maximum size of an NN_DIGIT array is set by MAX_NN_DIGITS which is
+derived from MAX_RSA_MODULUS_LEN, to ensure that all values are generated within
+an appropriate range.  The mathematical functions effectively treat NN_DIGIT
+arrays as integers of an arbitrary length.  In the context of natural numbers
+within RSAEURO, a &quot;digit&quot; is an NN_DIGIT element of a natural number,
+as opposed to the normal meaning (<I>i.e. </I>a single numerical digit).  For
+example, a ten-digit NN_DIGIT array consists of forty bytes of data (ten
+UINT4s).</P>
+<P>
+NN_DIGIT arrays are packed into unsigned character arrays, most significant bit
+first, when values are returned to higher-level functions.  This behaviour is
+primarily to maintain compatibility with existing RSAREF code.</P>
+<P>
+For the remainder of this section, the term &quot;natural number&quot; is used
+to describe an NN_DIGIT array.
+<A NAME="_Toc348263424">
+</A></P>
+<H2>
+<A NAME="RTFToC108">Functions</A><A NAME="NN_Decode"></A><A
+NAME="_Ref340052513"></A><A NAME="_Toc348263425"></A></H2>
+<H3>
+<A NAME="RTFToC109">NN_Decode</A></H3>
+<P><CODE>void NN_Decode (a, digits, b, len)<BR>NN_DIGIT *a;<BR>unsigned char
+*b;<BR>unsigned int digits, len;</CODE></P>
+<P>
+Decodes a character array into a natural number.  <B>b</B> is a pointer to the
+character array, which is <B>len</B> bytes long.  <B>a</B> is a pointer to the
+destination natural number, which is <B>digits</B> digits long.</P>
+<P>
+<B>digits</B> must be large enough to accommodate <B>len</B> bytes; if it is
+not, the most significant bytes of <B>a</B> are truncated.
+<A NAME="NN_Encode"></A><A NAME="_Ref340052639"></A><A NAME="_Toc348263426"></A>
+</P>
+<H3>
+<A NAME="RTFToC110">NN_Encode</A></H3>
+<P><CODE>void NN_Encode (a, len, b, digits)<BR>NN_DIGIT *b;<BR>unsigned char
+*a;<BR>unsigned int digits, len;</CODE></P>
+<P>
+Encodes a natural number into a character array.  <B>b</B> is a pointer to the
+natural number, which is <B>digits</B> digits long.  <B>a</B> points to the
+destination character array, which is <B>len</B> bytes long.</P>
+<P>
+<B>len</B> must be long enough to accommodate <B>digits</B> digits of <B>b</B>;
+if it is not, the most significant digits of the natural number are truncated.
+<A NAME="NN_Assign"></A><A NAME="_Ref340052415"></A><A NAME="_Toc348263427"></A>
+</P>
+<H3>
+<A NAME="RTFToC111">NN_Assign</A></H3>
+<P><CODE>void NN_Assign (a, b, digits)<BR>NN_DIGIT *a, *b;<BR>unsigned int
+digits;</CODE></P>
+<P>
+Assigns a = b, where <B>a</B> and <B>b</B> are natural numbers.  Note that
+only
+<B>digits</B> digits of <B>a</B> are assigned, so if NNDigits(a) &gt;
+NNDigits(b), the most significant digits of <B>a</B> will not be cleared.
+<A NAME="NN_AssignZero"></A><A NAME="_Ref340052441"></A><A
+NAME="_Toc348263428"></A>
+</P>
+<H3>
+<A NAME="RTFToC112">NN_AssignZero</A></H3>
+<P><CODE>void NN_AssignZero (a, digits)<BR>NN_DIGIT *a;<BR>unsigned int
+digits;</CODE></P>
+<P>
+Zeroises <B>digits</B> digits of the natural number <B>a</B>.
+<A NAME="NN_Assign2Exp"></A><A NAME="_Ref340052433"></A><A
+NAME="_Toc348263429"></A>
+</P>
+<H3>
+<A NAME="RTFToC113">NN_Assign2Exp</A></H3>
+<P><CODE>void NN_Assign2Exp (a, b, digits)<BR>NN_DIGIT *a;<BR>unsigned int
+b, digits;</CODE></P>
+<P>
+Assigns a = 2b. <B>a</B> is the destination natural number which has
+<B>digits</B> digits and <B>b</B> is the exponent. The result is undefined if
+<B>b</B> is greater than <B>digits</B>&amp;nbsp;*&amp;nbsp;NN_DIGIT_BITS.
+<A NAME="NN_Add"></A><A NAME="_Ref340052395"></A><A NAME="_Toc348263430"></A>
+</P>
+<H3>
+<A NAME="RTFToC114">NN_Add</A></H3>
+<P><CODE>NN_DIGIT NN_Add (a, b, c, digits)<BR>NN_DIGIT *a, *b, *c;<BR>unsigned
+int digits;</CODE></P>
+<P>
+Computes a = b + c, and returns the carry. <B>a</B>, <B>b</B>, <B>c</B> and
+the return value are natural numbers, all <B>digits</B> digits long.
+<A NAME="NN_Sub"></A><A NAME="_Ref340052852"></A><A NAME="_Toc348263431"></A>
+</P>
+<H3>
+<A NAME="RTFToC115">NN_Sub</A></H3>
+<P><CODE>NN_DIGIT NN_Sub (a, b, c, digits)<BR>NN_DIGIT *a, *b, *c;<BR>unsigned
+int digits;</CODE></P>
+<P>
+Computes a = b - c, and returns the borrow. <B>a</B>, <B>b</B>, <B>c</B> and
+the return value are natural numbers, all <B>digits</B> digits long.
+<A NAME="NN_Mult"></A><A NAME="_Ref340052823"></A><A NAME="_Toc348263432"></A>
+</P>
+<H3>
+<A NAME="RTFToC116">NN_Mult</A></H3>
+<P><CODE>void NN_Mult (a, b, c, digits)<BR>NN_DIGIT *a, *b, *c;<BR>unsigned
+int digits;</CODE></P>
+<P>
+Computes a = b * c. <B>a</B>, <B>b</B>, <B>c</B> and the return value are
+natural numbers, all <B>digits</B> digits long. The result is undefined if
+<B>digits</B> &gt; MAX_NN_DIGITS.
+<A NAME="NN_LShift"></A><A NAME="_Ref340052766"></A><A NAME="_Toc348263433"></A>
+</P>
+<H3>
+<A NAME="RTFToC117">NN_LShift</A></H3>
+<P><CODE>NN_DIGIT NN_LShift (a, b, c, digits)<BR>NN_DIGIT *a, *b;<BR>unsigned
+int c, digits;</CODE></P>
+<P>
+Computes a = b * 2c (<I>i.e.</I> shifts <B>b</B> left <B>c</B> bits,
+returning the result in <B>a</B>). <B>a</B>, <B>b</B>, <B>c</B> and the
+return value are natural numbers, all <B>digits</B> digits long.  The result is
+undefined if
+<B>c</B> &gt; NN_DIGIT_BITS.
+<A NAME="NN_Rshift"></A><A NAME="_Ref340052837"></A><A NAME="_Toc348263434"></A>
+</P>
+<H3>
+<A NAME="RTFToC118">NN_RShift</A></H3>
+<P><CODE>NN_DIGIT NN_RShift (a, b, c, digits)<BR>NN_DIGIT *a, *b;<BR>unsigned
+int c, digits;</CODE></P>
+<P>
+Computes a = b div 2c (<I>i.e.</I> shifts b right c bits, returning the result
+in a).  Returns the carry. <B>a</B>, <B>b</B>, <B>c</B> and the return value
+are natural numbers, all <B>digits</B> digits long.  The result is undefined if
+<B>c</B> &gt; NN_DIGIT_BITS.
+<A NAME="NN_Div"></A><A NAME="_Ref340052631"></A><A NAME="_Toc348263435"></A>
+</P>
+<H3>
+<A NAME="RTFToC119">NN_Div</A></H3>
+<P><CODE>void NN_Div (a, b, c, cDigits, d, dDigits)<BR>NN_DIGIT *a, *b, *c,
+*d;<BR>unsigned int cDigits, dDigits;</CODE></P>
+<P>
+Computes a = c div d and b = c mod d. <B>a</B>, <B>b</B>, <B>c</B> and <B>d</B>
+are natural numbers. <B>a</B> and <B>c</B> are <B>cDigits</B> digits long,
+<B>b</B> and <B>d</B> are <B>dDigits</B> digits long.  The result is
+undefined if <B>d</B> = 0, <B>cDigits</B> &gt;= 2&amp;nbsp;*&amp;nbsp;MAX_NN_DIGITS
+or
+<B>dDigits</B> &gt; MAX_NN_DIGITS.
+<A NAME="NN_Mod"></A><A NAME="_Ref340052776"></A><A NAME="_Toc348263436"></A>
+</P>
+<H3>
+<A NAME="RTFToC120">NN_Mod</A></H3>
+<P><CODE>void NN_Mod (a, b, bDigits, c, cDigits)<BR>NN_DIGIT *a, *b, *c;<BR>unsigned
+int bDigits, cDigits;</CODE></P>
+<P>
+Computes a = b mod c. <B>a</B>, <B>b</B>, and <B>c</B> are natural numbers.
+<B>a</B> and <B>c</B> are <B>cDigits</B> long, <B>b</B> is <B>bDigits</B>
+long. The result is undefined if c = 0, <B>bDigits</B> &gt;= 2&amp;nbsp;*&amp;nbsp;MAX_NN_DIGITS
+or <B>cDigits</B> &gt; MAX_NN_DIGITS
+<A NAME="NN_ModMult"></A><A NAME="_Ref340052806"></A><A NAME="_Toc348263437"></A>
+</P>
+<H3>
+<A NAME="RTFToC121">NN_ModMult</A></H3>
+<P><CODE>void NN_ModMult (a, b, c, d, digits)<BR>NN_DIGIT *a, *b, *c, *d;<BR>unsigned
+int digits;</CODE></P>
+<P>
+Computes a = b * c mod d. <B>a</B>, <B>b</B>, <B>c</B> and <B>d</B> are
+natural numbers, all <B>digits</B> digits long.  The result is undefined if
+<B>d</B> = 0 or <B>digits</B> &gt; MAX_NN_DIGITS.
+<A NAME="NN_ModExp"></A><A NAME="_Ref340052787"></A><A NAME="_Toc348263438"></A>
+</P>
+<H3>
+<A NAME="RTFToC122">NN_ModExp</A></H3>
+<P><CODE>void NN_ModExp (a, b, c, cDigits, d, dDigits)<BR>NN_DIGIT *a, *b,
+*c, *d;<BR>unsigned int cDigits, dDigits;</CODE></P>
+<P>
+Computes a = bc mod d. <B>a</B>, <B>b</B>, <B>c</B> and <B>d</B> are natural
+numbers. <B>a</B>, <B>b</B> and <B>d</B> are <B>dDigits</B> digits long,
+<B>c</B> is <B>cDigits</B> digits long..  The result is undefined if <B>d</B>
+= 0, <B>cDigits</B> = 0 or <B>dDigits</B> &gt; MAX_NN_DIGITS.
+<A NAME="NN_ModInv"></A><A NAME="_Ref340052795"></A><A NAME="_Toc348263439"></A>
+</P>
+<H3>
+<A NAME="RTFToC123">NN_ModInv</A></H3>
+<P><CODE>void NN_ModInv (a, b, c, digits)<BR>NN_DIGIT *a, *b, *c;<BR>unsigned
+int digits;</CODE></P>
+<P>
+Computes a = 1/b mod c. <B>a</B>, <B>b</B> and <B>c</B> are natural numbers,
+all <B>digits</B> digits long.  The result is undefined if <B>b</B> and
+<B>c</B> are not relatively prime (<I>e.g.</I> gcd(b, c) is not 1) or
+<B>digits</B> &gt; MAX_NN_DIGITS.
+<A NAME="NN_Gcd"></A><A NAME="_Ref340052655"></A><A NAME="_Toc348263440"></A>
+</P>
+<H3>
+<A NAME="RTFToC124">NN_Gcd</A></H3>
+<P><CODE>void NN_Gcd(a ,b ,c, digits)<BR>NN_DIGIT *a, *b, *c;<BR>unsigned
+int digits;</CODE></P>
+<P>
+Calculates the greatest common divisor of <B>b</B> and <B>c</B>, returning the
+result in <B>a</B>. <B>a</B>, <B>b</B> and <B>c</B> are natural numbers, all
+<B>digits</B> digits long.  The result is undefined if <B>c</B> &lt; <B>b</B>
+or <B>digits</B> &gt; MAX_NN_DIGITS.</P>
+<P>
+<A NAME="NN_Cmp"></A><A NAME="_Ref340052502"></A><A NAME="_Toc348263441"></A>
+</P>
+<H3>
+<A NAME="RTFToC125">NN_Cmp</A></H3>
+<P><CODE>int NN_Cmp (a, b, digits)<BR>NN_DIGIT *a, *b;<BR>unsigned int
+digits;</CODE></P>
+<P>
+Compares a and b, returns -1 if <B>a</B>&lt;<B>b</B>, 0 if <B>a</B>=<B>b</B>
+or 1 if <B>a</B>&gt;<B>b</B>. . <B>a</B>, <B>b</B> and <B>c</B> are natural
+numbers, all <B>digits</B> digits long.
+<A NAME="NN_Zero"></A><A NAME="_Ref340052861"></A><A NAME="_Toc348263442"></A>
+</P>
+<H3>
+<A NAME="RTFToC126">NN_Zero</A></H3>
+<P><CODE>int NN_Zero (a, digits)<BR>NN_DIGIT *a;<BR>unsigned int digits;</CODE></P>
+<P>
+Returns 1 iff a = 0, otherwise returns 1. <B>a</B> is a natural number,
+<B>digits</B> digits long.
+<A NAME="NN_Digits"></A><A NAME="_Ref340052617"></A><A NAME="_Toc348263443"></A>
+</P>
+<H3>
+<A NAME="RTFToC127">NN_Digits</A></H3>
+<P><CODE>unsigned int NN_Digits (a, digits)<BR>NN_DIGIT *a;<BR>unsigned int
+digits;</CODE></P>
+<P>
+Returns the significant length in digits of the natural number <B>a</B> (<I>e.g.</I>
+the position of the first non-zero digit). <B>digits</B> is the length of <B>a</B>
+in digits.
+<A NAME="NN_Bits"></A><A NAME="_Ref340052492"></A><A NAME="_Toc348263444"></A>
+</P>
+<H3>
+<A NAME="RTFToC128">NN_Bits</A></H3>
+<P><CODE>unsigned int NN_Bits (a, digits)<BR>NN_DIGIT *a;<BR>unsigned int
+digits;</CODE></P>
+<P>
+Returns the significant length in bits of the natural number <B>a</B> (<I>e.g.</I>
+the position of the first non-zero bit). <B>digits</B> is the total length of
+<B>a</B> in digits.
+<A NAME="_Ref340052385"></A><A NAME="_Toc348263445"></A>
+</P>
+<H3>
+<A NAME="RTFToC129">GeneratePrime</A></H3>
+<P><CODE>int GeneratePrime(a, b, c, d, digits, randomStruct)<BR>NN_DIGIT *a,
+*b, *c, *d;<BR>unsigned int digits;<BR>R_RANDOM_STRUCT *randomStruct; /*
+random structure */</CODE></P>
+<P>
+Generates a random probable prime <B>a</B>, where <B>b</B> &lt; <B>a</B> &lt;
+<B>c</B> and <B>a</B>-1 is divisible by <B>d</B>. <B>a</B>, <B>b</B>, <B>c</B>
+and <B>d</B> are natural numbers, all <B>digits</B> digits long.
+<B>randomStruct</B> is an initialised R_RANDOM_STRUCT.</P>
+<P>
+On exit, the generated prime is returned in <B>a</B>. Returns RE_NEED_RANDOM if
+<B>randomStruct</B> has not been fully initialised, RE_DATA if a suitable prime
+could not be found, IDOK otherwise.
+<A NAME="_Toc348263446">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC130">MEMORY MANIPULATION</A>
+<A NAME="_Toc348263447"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC131">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC132">Functions</A><OL>
+<LI><A HREF="#RTFToC133">R_memset</A>
+</LI>
+<LI><A HREF="#RTFToC134">R_memcpy</A>
+</LI>
+<LI><A HREF="#RTFToC135">R_memcmp</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC131">Introduction</A></H2>
+<P>There are three memory manipulation functions used within RSAEURO: 
+</P>
+<UL><LI><B>R_memset</B>  Sets a range of memory to a specified value.      
+</LI>
+<LI><B>R_memcpy</B>  Copies a block of memory to another address.      
+</LI>
+<LI><B>R_memcmp</B>  Compares two blocks of memory.                    
+</LI></UL>
+<P>All of these routines are &quot;secure&quot;, in that no intermediate
+storage is used during their operation.
+<A NAME="_Toc348263448">
+</A></P>
+<H2>
+<A NAME="RTFToC132">Functions</A><A NAME="R_memset"></A><A
+NAME="_Toc348263449"></A></H2>
+<H3>
+<A NAME="RTFToC133">R_memset</A></H3>
+<P><CODE>void R_memset(output, value, len)<BR>POINTER output;	/* output block
+*/<BR>int value;	/* value */<BR>unsigned int len;	/* length of block */</CODE></P>
+<P>
+Sets <B>len</B> bytes starting at <B>output</B> to <B>value</B>.
+<A NAME="R_memcpy"></A><A NAME="_Toc348263450">
+</A></P>
+<H3>
+<A NAME="RTFToC134">R_memcpy</A></H3>
+<P><CODE>void R_memcpy(output, input, len)<BR>POINTER output;	/* output block
+*/<BR>POINTER input;	/* input block */<BR>unsigned int len;	/* length of
+blocks */</CODE></P>
+<P>
+Copies <B>len</B> bytes from <B>input</B> to <B>output</B>.
+<A NAME="R_memcmp"></A><A NAME="_Toc348263451">
+</A></P>
+<H3>
+<A NAME="RTFToC135">R_memcmp</A></H3>
+<P><CODE>int R_memcmp(Block1, Block2, len)<BR>POINTER Block1;	/* first block
+*/<BR>POINTER Block2;	/* second block */<BR>unsigned int len;	/* length of
+blocks */</CODE></P>
+<P>
+Compares <B>len</B> bytes starting at <B>Block1</B> with <B>Block2</B>.</P>
+<P>
+Returns zero if the blocks are identical.  If the blocks are different, returns
+the difference between the first two non-identical bytes (returns
+<B>Block1[difference] - Block2[difference]</B>, where difference is the offset
+of the first non-identical byte.
+<A NAME="_Toc348263452">
+</A></P>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC136">TECHNICAL INFORMATION</A>
+<A NAME="_Toc348263453"></A></H1>
+<OL>
+<LI><A HREF="#RTFToC137">Introduction</A>
+</LI>
+<LI><A HREF="#RTFToC138">Error Types</A>
+</LI>
+<LI><A HREF="#RTFToC139">RSAEURO Data Types</A><OL>
+<LI><A HREF="#RTFToC140">R_RANDOM_STRUCT</A>
+</LI>
+<LI><A HREF="#RTFToC141">R_RSA_PUBLIC_KEY</A>
+</LI>
+<LI><A HREF="#RTFToC142">R_RSA_PRIVATE_KEY</A>
+</LI>
+<LI><A HREF="#RTFToC143">R_RSA_PROTO_KEY</A>
+</LI>
+<LI><A HREF="#RTFToC144">R_DH_PARAMS</A>
+</LI>
+<LI><A HREF="#RTFToC145">R_DIGEST_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC146">R_SIGNATURE_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC147">R_ENVELOPE_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC148">MD2_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC149">MD4_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC150">MD5_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC151">SHS_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC152">DES_CBC_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC153">DESX_CBC_CTX</A>
+</LI>
+<LI><A HREF="#RTFToC154">DES3_CBC_CTX</A></LI>
+</OL></LI>
+<LI><A HREF="#RTFToC155">Configuration parameters</A>
+</LI>
+<LI><A HREF="#RTFToC156">Platform-specific Configuration</A><OL>
+<LI><A HREF="#RTFToC157">Types</A>
+</LI>
+<LI><A HREF="#RTFToC158">Defined macros</A></LI>
+</OL></LI>
+<LI><A HREF="#RTFToC159">References</A><OL>
+<LI><A HREF="#RTFToC160">General</A>
+</LI>
+<LI><A HREF="#RTFToC161">RSA</A>
+</LI>
+<LI><A HREF="#RTFToC162">Diffie-Hellman</A>
+</LI>
+<LI><A HREF="#RTFToC163">Digest Algorithms</A>
+</LI>
+<LI><A HREF="#RTFToC164">DES</A>
+</LI>
+<LI><A HREF="#RTFToC165">Privacy-enhanced mail</A></LI></OL></LI>
+</OL>
+<H2>
+<A NAME="RTFToC137">Introduction</A></H2>
+<P>This section contains miscellaneous technical information regarding RSEURO.
+The following subjects are covered:
+</P>
+<OL>
+<LI><I>Error Type.</I>  A complete list of RSAEURO error types and possible
+explanations.
+</LI>
+<LI><I>RSAEURO Data Types</I>  A list and brief description of the major
+RSAEURO data types.
+</LI>
+<LI><I>Platform-specific configuration</I>  Platform-specific configuration
+information, including compiler settings and data structures.
+</LI>
+<LI><I>References</I>  Sources of further reading for related subjects and
+standards
+<A NAME="_Toc348263454"></A></LI></OL>
+<H2>
+<A NAME="RTFToC138">Error Types</A>
+</H2>
+<DL><DT>
+RE_CONTENT_ENCODING
+</DT>
+<DD>An ASCII encoding error occurred during the decoding of a content block.</DD>
+<DT>RE_DATA
+</DT>
+<DD>An error occurred during one of the mathematical routines. Usually caused
+by incorrect or invalid data, such as an unmatched set of Diffie-Hellman values.</DD>
+<DT>RE_DIGEST_ALGORITHM
+</DT>
+<DD>An invalid digest algorithm was selected; either an unsupported digest was
+selected (i.e. not one of the DA_xx values from RSAEURO.H), or SHS was selected
+for signature generation.
+</DD>
+<DT>RE_ENCODING
+</DT>
+<DD>An ASCII encoding error occurred during the decoding of a data block.</DD>
+<DT>RE_KEY
+</DT>
+<DD>The recovered session key cannot decrypt the associated content or
+signature.</DD>
+<DT>RE_KEY_ENCODING
+</DT>
+<DD>An ASCII encoding error occurred during the decoding of a session key.</DD>
+<DT>RE_LEN
+</DT>
+<DD>An out-of-range signature or session key was encountered, or the data
+supplied to an RSA function was too large for the key provided.</DD>
+<DT>RE_MODULUS_LEN
+</DT>
+<DD>An invalid RSA modulus length was specified (either too long or too short.</DD>
+<DT>RE_NEED_RANDOM
+</DT>
+<DD>An attempt was made to generate random data using an uninitialised random
+structure.</DD>
+<DT>RE_PRIVATE_KEY
+</DT>
+<DD>The supplied private key was invalid/incorrect.</DD>
+<DT>RE_PUBLIC_KEY
+</DT>
+<DD>The supplied public key was invalid/incorrect.</DD>
+<DT>RE_SIGNATURE
+</DT>
+<DD>The signature does not match the associated data block.</DD>
+<DT>RE_SIGNATURE_ENCODING
+</DT>
+<DD>An ASCII encoding error occurred during the decoding of a signature.</DD>
+<DT>RE_ENCRYPTION_ALGORITHM
+</DT>
+<DD>An invalid encryption algorithm was specified.  
+<A NAME="_Toc348263455">
+</A></DD></DL>
+<H2>
+<A NAME="RTFToC139">RSAEURO Data Types</A>
+<A NAME="_Toc348263456"></A></H2>
+<H3>
+<A NAME="RTFToC140">R_RANDOM_STRUCT</A></H3>
+<P><CODE>typedef struct {<BR>  unsigned int bytesNeeded;	/* seed bytes
+required */<BR>  unsigned char state[16];	/* state of object */<BR>  unsigned
+int outputAvailable;	/* number byte available */<BR>  unsigned char
+output[16];	/* output bytes */<BR>} R_RANDOM_STRUCT;</CODE></P>
+<P>
+The R_RANDOM_STRUCT type stores the state and characteristics of a random number
+generator. bytesNeeded	Number of remaining &quot;mix in&quot; bytes required to
+initialise the structure (initially defined by RANDOM_BYTES_RQ). Must be zero
+before the structure may be used.</P>
+<P>
+<B>state</B>	Internal state of the random number generator.</P>
+<P>
+<B>outputAvailable</B>	Indicates the number of unused bytes in the output
+array. When this value reaches zero, the output array is regenerated.</P>
+<P>
+<B>output</B>	Output of the random number generator.
+<A NAME="_Toc348263457">
+</A></P>
+<H3>
+<A NAME="RTFToC141">R_RSA_PUBLIC_KEY</A></H3>
+<P><CODE>typedef struct {<BR>  unsigned int bits;	/* length in bits of
+modulus */<BR>  unsigned char modulus[MAX_RSA_MODULUS_LEN];	/* modulus */<BR> 
+unsigned char exponent[MAX_RSA_MODULUS_LEN];	/* public exponent */<BR>}
+R_RSA_PUBLIC_KEY;</CODE></P>
+<P>
+The R_RSA_PUBLIC_KEY type stores an RSA public key. bits	The length of the
+modulus in bits (MIN_RSA_MODULUS_BITS &lt; bits &#163; MAX_RSA_MODULUS_BITS).</P>
+<P>
+<B>modulus</B>	The modulus, stored as a MAX_RSA_MODULUS_LEN byte number, most
+significant byte first, padded with zero bytes.</P>
+<P>
+<B>exponent</B>	The public exponent, stored in the same manner as the modulus.
+<A NAME="_Toc348263458">
+</A></P>
+<H3>
+<A NAME="RTFToC142">R_RSA_PRIVATE_KEY</A></H3>
+<P><CODE>typedef struct {<BR>  unsigned int bits;	/* length in bits of
+modulus */<BR>  unsigned char modulus[MAX_RSA_MODULUS_LEN];	/* modulus */ <BR>
+unsigned char publicExponent[MAX_RSA_MODULUS_LEN];	/* public exponent */ <BR>
+unsigned char exponent[MAX_RSA_MODULUS_LEN];	 /* private exponent */ <BR>
+unsigned char prime[2][MAX_RSA_PRIME_LEN];	/* prime factors */ <BR>  unsigned
+char primeExponent[2][MAX_RSA_PRIME_LEN];	/* exponents for CRT */ <BR> unsigned
+char coefficient[MAX_RSA_PRIME_LEN];	/* CRT coefficient */<BR>}
+R_RSA_PRIVATE_KEY;</CODE></P>
+<P>
+The R_RSA_PRIVATE_KEY type stores an RSA private key. bits	The length of the
+modulus in bits (MIN_RSA_MODULUS_BITS &lt; bits &#163; MAX_RSA_MODULUS_BITS).</P>
+<P>
+<B>modulus</B>	The modulus, stored as a MAX_RSA_MODULUS_LEN byte number, most
+significant byte first, zero padded.</P>
+<P>
+<B>publicExponent</B>	The public exponent, stored in the same manner as the
+modulus.</P>
+<P>
+<B>exponent</B>	The private exponent, stored in the same manner as the modulus.</P>
+<P>
+<B>prime</B>	The prime factors (p and q) of the modulus, stored as two
+MAX_RSA_PRIME_LEN long numbers in the same manner as the modulus (p&amp;nbsp;&gt;&amp;nbsp;q).</P>
+<P>
+<B>primeExponent</B>	The exponents for Chinese Remainder Theorem operations (d
+mod p-1 and d&amp;nbsp;mod&amp;nbsp;q-1), stored in the same manner as prime.</P>
+<P>
+<B>coefficient</B>	The coefficient (1/q mod p) for Chinese Remainder Theorem
+operations, stored in the same manner as prime.
+<A NAME="_Toc348263459">
+</A></P>
+<H3>
+<A NAME="RTFToC143">R_RSA_PROTO_KEY</A></H3>
+<P><CODE>typedef struct {   <BR>  unsigned int bits;	/* length in bits of
+modulus */<BR>  int useFermat4;	/* public exponent (1 = F4, 0 = 3) */<BR>}
+R_RSA_PROTO_KEY;</CODE></P>
+<P>
+The R_RSA_PROTO_KEY type provides a template for RSA keypair generation.
+bits	Length of the modulus in bits (MIN_RSA_MODULUS_BITS &lt; bits &lt;
+MAX_RSA_MODULUS_BITS).</P>
+<P>
+<B>useFermat4</B>	Public exponent, either Fermat4 or 3.
+<A NAME="_Toc348263460">
+</A></P>
+<H3>
+<A NAME="RTFToC144">R_DH_PARAMS</A></H3>
+<P><CODE>typedef struct {<BR>  unsigned char *prime;	/* prime */<BR> 
+unsigned int primeLen;	/* length of prime */<BR>  unsigned char *generator;	/*
+generator */<BR>  unsigned int generatorLen;	/* length of generator */<BR>}
+R_DH_PARAMS;</CODE></P>
+<P>
+The R_DH_PARAMS type stores a set of parameters for a Diffie-Hellman key
+exchange. prime	The prime p, stored as a primeLen-byte long number, most
+significant byte first, zero padded.</P>
+<P>
+<B>primeLen</B>	The length in bytes of prime.</P>
+<P>
+<B>generator</B>	The generator g, stored in the same manner as prime.</P>
+<P>
+<B>generatorLen</B>	The length in bytes of generator.
+<A NAME="_Toc348263461">
+</A></P>
+<H3>
+<A NAME="RTFToC145">R_DIGEST_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  int digestAlgorithm;	/* digest type */<BR> 
+union { /* digest sub-context */<BR>     MD2_CTX md2;<BR>     MD4_CTX md4;<BR>
+MD5_CTX md5;<BR>     SHS_CTX shs;     <BR>  } context;<BR>} R_DIGEST_CTX;</CODE></P>
+<P>
+The R_DIGEST_CTX type stores the context for a message digest generation.
+digestAlgorithm	The message digest algorithm for the context (DA_MD2, DA_MD4,
+DA_MD5 or DA_SHS).</P>
+<P>
+<B>context</B>	The algorithm-specific context
+<A NAME="_Toc348263462">
+</A></P>
+<H3>
+<A NAME="RTFToC146">R_SIGNATURE_CTX</A></H3>
+<P><CODE>typedef struct {<BR>     R_DIGEST_CTX digestContext;<BR>}
+R_SIGNATURE_CTX;</CODE></P>
+<P>
+The R_SIGNATURE_CTX type stores the context for a signature generation.
+Currently, R_SIGNATUR_CTX is the same as R_DIGEST_CTX, although it has been
+separately typed for future revisions.
+<A NAME="_Toc348263463">
+</A></P>
+<H3>
+<A NAME="RTFToC147">R_ENVELOPE_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  int encryptionAlgorithm;	/* encryption type */<BR>
+union { 	/* encryption sub-context */<BR>     DES_CBC_CTX des;<BR>
+DES3_CBC_CTX des3;<BR>     DESX_CBC_CTX desx;<BR>  } cipherContext;<BR>
+unsigned char buffer[8];	/* data buffer */<BR>  unsigned int bufferLen;	/*
+buffer length */<BR>} R_ENVELOPE_CTX;</CODE></P>
+<P>
+The R_ENVELOPE_CTX type stores the context for a &quot;sealing&quot;
+(encryption) operation. encryptionAlgorithm	The encryption algorithm for the
+context (EA_DES_CBC, EA_DES_EDE2_CBC, EA_DES_EDE3_CBC or EA_DESX_CBC).</P>
+<P>
+<B>cipherContext</B>	The cipher-specific context.</P>
+<P>
+<B>buffer</B>	The input buffer for the sealing operation (DES encrypts in
+64-bit blocks, so incoming data is buffered until 8 bytes are available).</P>
+<P>
+<B>bufferLen</B>	The number of bytes in the buffer.
+<A NAME="_Toc348263464">
+</A></P>
+<H3>
+<A NAME="RTFToC148">MD2_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  unsigned char state[16];	/* state */<BR> 
+unsigned char checksum[16];	/* checksum */<BR>  unsigned int count;	/* number
+of bytes, modulo 16 */<BR>  unsigned char buffer[16];	/* input buffer */<BR>}
+MD2_CTX;</CODE></P>
+<P>
+The MD2_CTX type stores the context for an MD2 operation. state	Internal state
+machine.</P>
+<P>
+<B>checksum</B>	Checksum (see MD2 source for details).</P>
+<P>
+<B>count</B>	Number of bytes processed, modulo 16.</P>
+<P>
+<B>buffer</B>	Input buffer for data to be processed.
+<A NAME="_Toc348263465">
+</A></P>
+<H3>
+<A NAME="RTFToC149">MD4_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  UINT4 state[4];	/* state (ABCD) */<BR>  UINT4
+count[2];	/* number of bits, modulo 2^64 (lsb first) */<BR>  unsigned char
+buffer[64];	/* input buffer */<BR>} MD4_CTX</CODE></P>
+<P>
+The MD4_CTX type stores the context for an MD4 operation. state	Internal state
+machine.</P>
+<P>
+count	Number of bits processed, modulo 264</P>
+<P>
+buffer	Input buffer for data to be processed.
+<A NAME="_Toc348263466">
+</A></P>
+<H3>
+<A NAME="RTFToC150">MD5_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  UINT4 state[4]; 	/* state (ABCD) */<BR> 
+UINT4 count[2];	/* number of bits, modulo 2^64 (lsb first) */<BR>  unsigned
+char buffer[64];	/* input buffer */<BR>} MD5_CTX;</CODE></P>
+<P>
+The MD5_CTX type stores the context for an MD5 operation. state	Internal state
+machine.</P>
+<P>
+<B>count</B>	Number of bits processed, modulo 264</P>
+<P>
+<B>buffer</B>	Input buffer for data to be processed.
+<A NAME="_Toc348263467">
+</A></P>
+<H3>
+<A NAME="RTFToC151">SHS_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  UINT4 digest [5];	/* Message digest */<BR> 
+UINT4 countLo, countHi;	/* 64-bit bit count */<BR>  UINT4 data [16];	/* SHS
+data buffer */<BR>} SHS_CTX;</CODE></P>
+<P>
+The SHS_CTX type stores the context for an MD5 operation. state	Internal state
+machine.</P>
+<P>
+<B>countLo</B>	Number of bits processed, least significant part.</P>
+<P>
+<B>countHi</B>	Number of bits processed, most significant part.</P>
+<P>
+<B>data</B>	Input buffer for data to be processed.
+<A NAME="_Toc348263468">
+</A></P>
+<H3>
+<A NAME="RTFToC152">DES_CBC_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  UINT4 subkeys[32];	/* subkeys */<BR>  UINT4
+iv[2]; /* initializing vector */<BR>  UINT4 originalIV[2];	/* for restarting
+the context */<BR>  int encrypt;	/* encrypt flag */<BR>} DES_CBC_CTX;</CODE></P>
+<P>
+The DES_CBC_CTX type stores the context for an single-key DES CBC operation.
+subkeys	Array of DES subkeys, ordered according to initialisation (in &quot;normal&quot;
+order for encryption, &quot;reverse&quot; order for decryption).</P>
+<P>
+<B>iv</B>	64-bit initialising vector (current state).</P>
+<P>
+<B>originalIV</B>	64-bit initialising vector (initial state).</P>
+<P>
+<B>encrypt</B>	&quot;Direction&quot; indicator; one for encrypt, zero for
+decrypt.
+<A NAME="_Toc348263469">
+</A></P>
+<H3>
+<A NAME="RTFToC153">DESX_CBC_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  UINT4 subkeys[32];	/* subkeys */<BR>  UINT4
+iv[2]; /* initializing vector */<BR>  UINT4 inputWhitener[2];	/* input whitener
+*/<BR> UINT4 outputWhitener[2];	/* output whitener */<BR>  UINT4
+originalIV[2];	/* for restarting the context */<BR>  int encrypt;	/* encrypt
+flag */<BR>} DESX_CBC_CTX;</CODE></P>
+<P>
+The DESX_CBC_CTX type stores the context for an single-key DESX CBC operation.
+subkeys	Array of DES subkeys, ordered according to initialisation (in &quot;normal&quot;
+order for encryption, &quot;reverse&quot; order for decryption).</P>
+<P>
+<B>iv</B>	64-bit initialising vector (current state).</P>
+<P>
+<B>inputWhitener</B>	64-bit input &quot;whitener&quot;, XORed with data during
+encryption.</P>
+<P>
+<B>outputWhitener</B>	64-bit input &quot;whitener&quot;, XORed with data during
+encryption.</P>
+<P>
+<B>originalIV</B>	64-bit initialising vector (initial state).</P>
+<P>
+<B>encrypt</B>	&quot;Direction&quot; indicator; one for encrypt, zero for
+decrypt.
+<A NAME="_Toc348263470">
+</A></P>
+<H3>
+<A NAME="RTFToC154">DES3_CBC_CTX</A></H3>
+<P><CODE>typedef struct {<BR>  UINT4 subkeys[3][32];	/* subkeys for three
+operations */<BR>  UINT4 iv[2];	/* initializing vector */<BR>  UINT4
+originalIV[2];	/* for restarting the context */<BR>  int encrypt;	/* encrypt
+flag */<BR>} DES3_CBC_CTX;</CODE></P>
+<P>
+The DES3_CBC_CTX type stores the context for an triple-key DES CBC operation.
+subkeys	Two-dimensional array of DES subkeys, ordered according to
+initialisation (in &quot;normal&quot; order for encryption, &quot;reverse&quot;
+order for decryption).</P>
+<P>
+<B>iv</B>	64-bit initialising vector (current state).</P>
+<P>
+<B>originalIV</B>	64-bit initialising vector (initial state).</P>
+<P>
+<B>encrypt</B>	&quot;Direction&quot; indicator; one for encrypt, zero for
+decrypt.
+<A NAME="_Toc348263471">
+</A></P>
+<H2>
+<A NAME="RTFToC155">Configuration parameters</A>
+</H2>
+<P>The following table describes some of the values defined in the RSAEURO
+toolkit header files which may be modified to customise the behaviour of certain
+routines.  Although the toolkit has been designed with portability in mind, no
+guarantee is made that the code will work with different settings - please
+report any difficulties. 
+</P>
+<PRE>
+Parameter                    Defined in     Description                       Default       
+                                                                              value         
+MIN_RSA_MODULUS_BITS         RSAEURO.H      Minimum size permitted for RSA    508 bits      
+                                            modulus.                                        
+MAX_RSA_MODULUS_BITS         RSAEURO.H      Maximum size permitted for RSA    1024 bits     
+                                            modulus.  (Note: change this                    
+                                            value to allow the use of                       
+                                            larger keys etc)                                
+MAX_DIGEST_LEN               RSAEURO.H      Maximum digest size, in bytes,    20 bytes      
+                                            for any of the supported          (SHS)         
+                                            algorithms.                                     
+RSAEURO_VER_MAJ              RSAEURO.H      Major version number of the       1             
+                                            toolkit.                                        
+RSAEURO_VER_MIN              RSAEURO.H      Minor version number of the       03            
+                                            toolkit.                                        
+RSAEURO_IDENT                RSAEURO.H      Identifier string for the         RSAEURO       
+                                            toolkit (to support variants)                   
+RSAEURO_DATE                 RSAEURO.H      Release date of the major         21/08/94      
+                                            version of the toolkit.                         
+NN_DIGIT                     NN.H           Type for natural number &quot;digit&quot;   UINT4         
+                                                                              (32-bit       
+                                                                              word)         
+NN_DIGIT_BITS                NN.H           Number of bits in an NN_DIGIT     32            
+MAX_NN_DIGIT                 RSAEURO.H      Maximum permitted value for an    0xFFFFFFFF    
+                                            NN_DIGIT                                        
+RANDOM_BYTES_RQ              R_RANDOM.C     Number of random bytes required   256           
+                                            to &quot;seed&quot; a random structure                    
+                                            prior to use.                                   
+RANDOM_BYTES_RQINT           R_RANDOM.C     Number of random bytes from       512           
+                                            ANSI time functions required to                 
+                                            &quot;seed&quot; a random structure prior                 
+                                            to use.                                         
+SHS_BLOCKSIZE                SHS.H          SHS block size, in bytes.         60            
+SHS_DIGESTSIZE               SHS.H          SHS digest size, in bytes.        20            
+<A NAME="_Toc348263472">
+</A></PRE>
+<H2>
+<A NAME="RTFToC156">Platform-specific Configuration</A>
+<A NAME="_Toc348263473"></A></H2>
+<H3>
+<A NAME="RTFToC157">Types</A></H3>
+<P>There are three platform-specific types used in RSAEURO, defined in GLOBAL.H
+and described in the following paragraphs. POINTER	A generic pointer to memory.
+It should be possible to cast any other pointer to POINTER.</P>
+<P>
+<B>BYTE</B>	An 8-bit byte.</P>
+<P>
+<B>UINT2</B>	A 16-bit unsigned integer.</P>
+<P>
+<B>UINT4</B>	A 32-bit unsigned integer.
+<A NAME="_Toc348263474">
+</A></P>
+<H3>
+<A NAME="RTFToC158">Defined macros</A>
+</H3>
+<P>RSAEURO uses three #defined macros:
+</P>
+<UL><LI><P>PROTOTYPES	The PROTOTYPES macro indicates the form of C function
+declarations. If it is non-zero, functions are declared as:<BR><BR><TT>type
+function (type, ...., type);</TT><BR></P><P>
+	Otherwise, they take the form:<BR><BR><TT>type function ();<BR></TT></P></LI>
+<LI><P>
+USEASM	If USEASM is defined then assembler routines are used where available.
+Assembler versions of the key performance bottlenecks are under development.
+Please check the source list to see which functions have been implemented in
+assembler.</P></LI>
+<LI><P>
+USE_ANSI	If USE_ANSI is defined, the ANSI-standard memcpy, memcmp and memset
+routines are used in place of the RSAEURO stdlib routines.
+<A NAME="_Toc348263475">
+</A></P></LI></UL>
+<H2>
+<A NAME="RTFToC159">References</A><A NAME="_Toc348263476"></A></H2>
+<H3>
+<A NAME="RTFToC160">General</A></H3>
+<P>For general information about cryptography and its applications, consult the
+following:
+</P>
+<UL>
+<LI>	Bruce Schneier's &quot;Applied Cryptography&amp;nbsp;-&amp;nbsp;Protocols,
+Algorithms, and Source Code in C&quot; (John Wiley &amp; Sons, ISBN TBA) is an
+excellent introduction to cryptography both from the theoretical and &quot;real
+world&quot; perspective.  It contains full coverage of all the commonly-used
+algorithms, and a detailed examination of the accompanying protocols.
+</LI>
+<LI><I>	</I>The frequently-asked questions (FAQ) file for the Usenet newsgroup
+sci.crypt provides a good basic coverage of the issues involved in cryptography,
+and is available free of charge over the Internet (available on the Internet  
+<A HREF="ftp://rtfm.mit.edu/pub/usenet/news.answers/cryptography-faq">here</A>).
+</LI>
+<LI><I></I>	RSADSI provide a good introduction to cryptography in the form of &quot;Frequently
+Asked Questions About Today's Cryptography&quot;, a document available free of
+charge by anonymous FTP from <A HREF="ftp://ftp.rsa.com/">here</A>.  
+</LI>
+<LI>	The author of RSAEURO maintains a <A HREF="http://www.phantom.com/~skapp">good
+cryptography-based World Wide Web page</A>. The page contains links to many
+other cryptography and security-related sites.
+</LI>
+<LI>	RSADSI provide a number of standards relating to &quot;real-life&quot;
+usage of cryptographic algorithms and protocols known as the Public Key
+Cryptography Standards (PKCS), as follows:<UL>
+<LI>	<I>PKCS #1: RSA Encryption Standard</I>. PKCS #1 describes a method,
+called rsaEncryption, for encrypting data using the RSA public-key cryptosystem.
+</LI>
+<LI>	<I>PKCS #3: Diffie-Hellman Key Agreement Standard</I>.  PKCS #3 describes
+a method for implementing Diffie-Hellman key agreement, whereby two parties,
+without any prior arrangements, can agree upon a secret key that is known only
+to them (and, in particular, is not known to an eavesdropper listening to the
+dialogue by which the parties agree on the key).
+</LI>
+<LI>	<I>PKCS #5: Password-Based Encryption Standard</I>. PKCS #5 describes a
+method for encrypting an octet string with a secret key derived from a password.
+The result of the method is an octet string.
+</LI>
+<LI>	<I>PKCS #6: Extended-Certificate Syntax Standard</I>.  PKCS #6 describes
+a syntax for extended certificates. An extended certificate consists of an X.509
+public-key certificate and a set of attributes, collectively signed by the
+issuer of the X.509 public-key certificate.
+</LI>
+<LI>	<I>PKCS #7: Cryptographic Message Syntax Standard</I>.  PKCS #7 describes
+a general syntax for data that may have cryptography applied to it, such as
+digital signatures and digital envelopes.
+</LI>
+<LI>	<I>PKCS #8: Private-Key Information Syntax Standard</I>.  PKCS #8
+describes a syntax for private-key information. Private-key information includes
+a private key for some public-key algorithm and a set of attributes.
+</LI>
+<LI>	<I>PKCS #9: Selected Attribute Types</I>.  PKCS #9 defines selected
+attribute types for use in PKCS #6 extended certificates, PKCS #7 digitally
+signed messages, and PKCS #8 private-key information.
+</LI>
+<LI>	<I>PKCS #10: Certification Request Syntax Standard</I>.  PKCS #10
+describes a syntax for certification requests.</LI>
+</UL></LI>
+<LI><TT></TT><TT></TT>Details of the PKCS standards can be obtained by
+mailing
+<A HREF="mailto:pkcs@rsa.com">pkcs@rsa.com</A> or via
+<A HREF="ftp://ftp.rsa.com/">anonymous ftp</A>.
+</LI>
+<LI>	National Bureau of Standards. FIPS PUB 113: Computer data authentication,
+30 May 1985.
+</LI>
+<LI>	Privacy and Authentication: An Introduction to Cryptography, W.  Diffie,
+M.E. Hellman, Proc. of the IEEE, Vol 67, No. 3, March 1979.
+<A NAME="_Toc348263477"></A></LI></UL>
+<H3>
+<A NAME="RTFToC161">RSA</A></H3>
+<P>For further details of the RSA algorithm, consult the following:
+</P>
+<UL>
+<LI>	R. Rivest, A. Shamir, and L. Adleman, &quot;A Method for Obtaining Digital
+Signatures and Public-Key Cryptosystems&quot;, Communications of the ACM, v. 21,
+n. 2, 2 Feb 1978, pp. 120-126.
+</LI>
+<LI>	R. Rivest, A. Shamir, and L. Adleman, &quot;On Digital Signatures and
+Public-Key Cryptosystems&quot;, MIT Laboratory for Computer Science, Technical
+Report, MIT/LCS/TR-212, Jan 1979
+</LI>
+<LI>	R. Rivest, A. Shamir, and L. Adleman, &quot;Cryptographic Communications
+System and Method&quot;, US Patent 4,405,829, 20/9/83.
+<A NAME="_Toc348263478"></A></LI></UL>
+<H3>
+<A NAME="RTFToC162">Diffie-Hellman</A></H3>
+<P>For further details of the Diffie-Hellman key exchange algorithm, consult
+the following:
+</P>
+<UL>
+<LI>	W. Diffie and M.E. Hellman. New directions in cryptography. IEEE
+Transactions on Information Theory, IT-22:644-654, 1976.
+</LI>
+<LI>	RSA Laboratories. PKCS #3: Diffie-Hellman Key-Agreement Standard.
+<A NAME="_Toc348263479"></A></LI></UL>
+<H3>
+<A NAME="RTFToC163">Digest Algorithms</A>
+</H3>
+<P>For further details of the digest algorithms used in RSAEURO, consult the
+following:
+</P>
+<UL>
+<LI>	B. Kaliski. RFC 1319: The MD2 Message-Digest Algorithm. April 1992.
+</LI>
+<LI>	R. Rivest. RFC 1320: The MD4 Message-Digest Algorithm. April 1992.
+</LI>
+<LI>	R. Rivest. RFC 1321: The MD5 Message-Digest Algorithm. April 1992.
+</LI>
+<LI>	NIST FIPS PUB 180, &quot;Secure Hash Standard&quot;, National Institute of
+Standards and Technology, US Department of commerce, April 1993 [draft].
+<A NAME="_Toc348263480"></A></LI></UL>
+<H3>
+<A NAME="RTFToC164">DES</A></H3>
+<P>For further details of the Data Encryption Standard, consult the following:
+</P>
+<UL>
+<LI>	National Bureau of Standards. FIPS Publication 46-1: Data Encryption
+Standard. January 1988.
+</LI>
+<LI>	National Bureau of Standards. FIPS Publication 81: DES Modes of Operation.
+December 1980.
+</LI>
+<LI>	National Bureau of Standards. FIPS PUB 74: Guidelines for implementing and
+Using the NBS Data Encryption Standard.  1 April 1981.
+</LI>
+<LI>	Exhaustive Cryptanalysis of the NBS Data Encryption Standard, W.Diffie &amp;
+M.E.Hellman, IEEE Computer, June 1977.
+</LI>
+<LI>	An Application of a Fast Data Encryption Standard Implementation, Matt
+Bishop, Computing Systems, Vol. 1, No. 3, Summer 1988.
+</LI>
+<LI>	Differential Cryptanalysis of DES-like Cryptosystems, E.Biham and
+A.Shamir, Journal of Cryptology.
+</LI>
+<LI>	A High-Speed Software DES Implementation, D.C.Feldmeier, Computer
+Communications Research Group, Bellcore, June 1989.
+<A NAME="_Toc348263481"></A></LI></UL>
+<H3>
+<A NAME="RTFToC165">Privacy-enhanced mail</A>
+</H3>
+<P>For further details of Internet privacy-enhanced mail and its applications,
+consult the following:
+</P>
+<UL>
+<LI>	J. Linn. RFC 1421: Privacy Enhancement for Internet Electronic Mail: Part
+I: Message Encryption and Authentication Procedures. February 1993.
+</LI>
+<LI>	S. Kent. RFC 1422: Privacy Enhancement for Internet Electronic Mail: Part
+II: Certificate-Based Key Management. February 1993.
+</LI>
+<LI>	D. Balenson. RFC 1423: Privacy Enhancement for Internet Electronic Mail:
+Part III: Algorithms, Modes, and Identifiers. February 1993.
+</LI>
+<LI>	B. Kaliski. RFC 1424: Privacy Enhancement for Internet Electronic Mail:
+Part IV: Key Certification and Related Services. February 1993.
+</LI>
+<LI>	Privacy-Enhanced Electronic Mail, Matt Bishop, Dept. of Maths and Computer
+Science, Dartmouth College.
+</LI>
+<LI>	Recent Changes to Privacy Enhanced Electronic Mail, Matt Bishop.
+<A NAME="_Toc348263482"></A></LI></UL>
+<HR SIZE="3" ALIGN="CENTER">
+<H1>
+<A NAME="RTFToC166">APPENDIX A: FUNCTION CROSS-REFERENCE</A>
+</H1>
+<P>This section provides a cross-reference for each function, indicating where
+it is described in the documentation.  The functions are listed in alphabetical
+order. 
+</P>
+<P><A HREF="#RTFToC99">DES3_CBCInit</A>
+</P>
+<P><A HREF="#RTFToC100">DES3_CBCRestart</A>
+</P>
+<P><A HREF="#RTFToC101">DES3_CBCUpdate </A>
+</P>
+<P><A HREF="#RTFToC99">DES3_CBCInit</A>
+</P>
+<P><A HREF="#RTFToC100">DES3_CBCRestart</A>
+</P>
+<P><A HREF="#RTFToC101">DES3_CBCUpdate </A>
+</P>
+<P><A HREF="#RTFToC102">DESX_CBCInit</A>
+</P>
+<P><A HREF="#RTFToC103">DESX_CBCRestart</A>
+</P>
+<P><A HREF="#RTFToC104">DESX_CBCUpdate </A>
+</P>
+<P><A HREF="#RTFToC129">GeneratePrime</A>
+</P>
+<P><A HREF="#RTFToC34">MD2Final</A>
+</P>
+<P><A HREF="#RTFToC32">MD2Init</A>
+</P>
+<P><A HREF="#RTFToC33">MD2Update</A>
+</P>
+<P><A HREF="#RTFToC37">MD4Final</A>
+</P>
+<P><A HREF="#RTFToC35">MD4Init</A>
+</P>
+<P><A HREF="#RTFToC36">MD4Update</A>
+</P>
+<P><A HREF="#RTFToC40">MD5Final</A>
+</P>
+<P><A HREF="#RTFToC38">MD5Init</A>
+</P>
+<P><A HREF="#RTFToC39">MD5Update</A>
+</P>
+<P><A HREF="#RTFToC114">NN_Add</A>
+</P>
+<P><A HREF="#RTFToC111">NN_Assign</A>
+</P>
+<P><A HREF="#RTFToC113">NN_Assign2Exp</A>
+</P>
+<P><A HREF="#RTFToC112">NN_AssignZero</A>
+</P>
+<P><A HREF="#RTFToC125">NN_Cmp</A>
+</P>
+<P><A HREF="#RTFToC109">NN_Decode</A>
+</P>
+<P><A HREF="#RTFToC127">NN_Digits</A>
+</P>
+<P><A HREF="#RTFToC119">NN_Div</A> 
+</P>
+<P><A HREF="#RTFToC110">NN_Encode</A>
+</P>
+<P><A HREF="#RTFToC124">NN_Gcd</A>   
+</P>
+<P><A HREF="#RTFToC117">NN_LShift</A>
+</P>
+<P><A HREF="#RTFToC120">NN_Mod</A>
+</P>
+<P><A HREF="#RTFToC122">NN_ModExp</A>
+</P>
+<P><A HREF="#RTFToC123">NN_ModInv</A>
+</P>
+<P><A HREF="#RTFToC121">NN_ModMult</A>
+</P>
+<P><A HREF="#RTFToC116">NN_Mult</A>  
+</P>
+<P><A HREF="#RTFToC118">NN_RShift</A>
+</P>
+<P><A HREF="#RTFToC115">NN_Sub</A>
+</P>
+<P><A HREF="#RTFToC126">NN_Zero</A>
+</P>
+<P><A HREF="#RTFToC85">R_ComputeDHAgreedKey</A>
+</P>
+<P><A HREF="#RTFToC70">R_DecodePEMBlock</A>
+</P>
+<P><A HREF="#RTFToC76">R_DecryptOpenPEMBlock</A>
+</P>
+<P><A HREF="#RTFToC31">R_DigestBlock</A>
+</P>
+<P><A HREF="#RTFToC31">R_DigestBlock</A>
+</P>
+<P><A HREF="#RTFToC28">R_DigestInit</A>
+</P>
+<P><A HREF="#RTFToC29">R_DigestUpdate</A>
+</P>
+<P><A HREF="#RTFToC69">R_EncodePEMBlock</A>
+</P>
+<P><A HREF="#RTFToC75">R_EncryptOpenPEMBlock</A>
+</P>
+<P><A HREF="#RTFToC21">R_GenerateBytes</A>
+</P>
+<P><A HREF="#RTFToC83">R_GenerateDHParams</A>
+</P>
+<P><A HREF="#RTFToC82">R_GeneratePEMKeys</A>
+</P>
+<P><A HREF="#RTFToC20">R_GetRandomBytesNeeded</A>
+</P>
+<P><A HREF="#RTFToC135">R_memcmp</A>
+</P>
+<P><A HREF="#RTFToC134">R_memcpy</A>
+</P>
+<P><A HREF="#RTFToC133">R_memset</A>
+</P>
+<P><A HREF="#RTFToC65">R_OpenFinal</A>
+</P>
+<P><A HREF="#RTFToC63">R_OpenInit</A>
+</P>
+<P><A HREF="#RTFToC74">R_OpenPEMBlock</A>
+</P>
+<P><A HREF="#RTFToC64">R_OpenUpdate</A>
+</P>
+<P><A HREF="#RTFToC23">R_RandomCreate</A>
+</P>
+<P><A HREF="#RTFToC22">R_RandomFinal</A>
+</P>
+<P><A HREF="#RTFToC18">R_RandomInit</A>
+</P>
+<P><A HREF="#RTFToC24">R_RandomMix</A>
+</P>
+<P><A HREF="#RTFToC19">R_RandomUpdate</A>
+</P>
+<P><A HREF="#RTFToC62">R_SealFinal</A>
+</P>
+<P><A HREF="#RTFToC60">R_SealInit</A>
+</P>
+<P><A HREF="#RTFToC73">R_SealPEMBlock</A>
+</P>
+<P><A HREF="#RTFToC61">R_SealUpdate</A>
+</P>
+<P><A HREF="#RTFToC84">R_SetupDHAgreement</A>
+</P>
+<P><A HREF="#RTFToC50">R_SignBlock</A>
+</P>
+<P><A HREF="#RTFToC49">R_SignFinal</A>
+</P>
+<P><A HREF="#RTFToC47">R_SignInit</A>
+</P>
+<P><A HREF="#RTFToC71">R_SignPEMBlock</A>
+</P>
+<P><A HREF="#RTFToC48">R_SignUpdate</A>
+</P>
+<P><A HREF="#RTFToC54">R_VerifyBlockSignature</A>
+</P>
+<P><A HREF="#RTFToC53">R_VerifyFinal</A>
+</P>
+<P><A HREF="#RTFToC51">R_VerifyInit</A>
+</P>
+<P><A HREF="#RTFToC72">R_VerifyPEMSignature</A>
+</P>
+<P><A HREF="#RTFToC52">R_VerifyUpdate</A>
+</P>
+<P><A HREF="#RTFToC90">RSAPrivateDecrypt</A>
+</P>
+<P><A HREF="#RTFToC89">RSAPrivateEncrypt</A>                  
+</P>
+<P><A HREF="#RTFToC92">RSAPublicDecrypt</A>
+</P>
+<P><A HREF="#RTFToC91">RSAPublicEncrypt</A>
+</P>
+<P><A HREF="#RTFToC43">SHSFinal</A>                           
+</P>
+<P><A HREF="#RTFToC41">SHSInit</A>
+</P>
+<P><A HREF="#RTFToC42">SHSUpdate</A></P> 
+<P>
+</P></BODY></HTML>

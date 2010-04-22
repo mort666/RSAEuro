@@ -1,7 +1,7 @@
 /*
 	RSA.C - RSA routines for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -21,9 +21,12 @@
 		0.90 First revision, code produced very similar to that
 		of RSAREF(tm), still it worked fine.
 
-		0.91 Current revision, code altered to aid speeding up.
+        0.91 Second revision, code altered to aid speeding up.
 		Used pointer accesses to arrays to speed up some parts,
 		mainly during the loops.
+
+        1.03 Third revision, Random Structure initialization
+        double check, RSAPublicEncrypt can now return RE_NEED_RANDOM.
 */
 
 #include "rsaeuro.h"
@@ -51,7 +54,11 @@ R_RANDOM_STRUCT *randomStruct;  /* random structure */
 	modulusLen = (publicKey->bits + 7) / 8;
 
 	if(inputLen + 11 > modulusLen)
-		return(RE_LEN);
+        return(RE_LEN);
+
+    R_GetRandomBytesNeeded(&i, randomStruct);
+    if(i != 0)
+        return(RE_NEED_RANDOM);
 
 	*pkcsBlock = 0;                 /* PKCS Block Makeup */
 
@@ -65,6 +72,7 @@ R_RANDOM_STRUCT *randomStruct;  /* random structure */
 		}while(byte == 0);
 		*(pkcsBlock+i) = byte;
 	}
+
 	/* separator */
 	pkcsBlock[i++] = 0;
 
@@ -340,7 +348,6 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	NN_Encode (output, *outputLen, t, nDigits);
 
 	/* Clear sensitive information. */
-/*
 	R_memset((POINTER)c, 0, sizeof(c));
 	R_memset((POINTER)cP, 0, sizeof(cP));
 	R_memset((POINTER)cQ, 0, sizeof(cQ));
@@ -352,6 +359,5 @@ R_RSA_PRIVATE_KEY *privateKey;  /* RSA private key */
 	R_memset((POINTER)q, 0, sizeof(q));
 	R_memset((POINTER)qInv, 0, sizeof(qInv));
 	R_memset((POINTER)t, 0, sizeof(t));
-*/
 	return(IDOK);
 }

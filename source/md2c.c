@@ -1,4 +1,4 @@
-/* Modifications Copyright (c) J.S.A.Kapp 1994 - 1995.
+/* Modifications Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	 MD2 Component Of RSAEURO using RSA Data Security, Inc.
 	 MD2 Message Digest Algorithm.

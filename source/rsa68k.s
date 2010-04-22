@@ -1,7 +1,7 @@
 /*
 	RSA68K.S - processor-specific C library routines for RSAEURO
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+        Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF 2.0.
 
@@ -34,8 +34,6 @@
 
 		Some speed increases where noticed with the addition of
 		these functions.
-
-		1.00 23/6/95, Final Release Version
 */
 
 	/* R_STDLIB Routines */

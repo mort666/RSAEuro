@@ -1,7 +1,7 @@
 /*
 	R_ENCODE.C - RFC 1113 encoding and decoding routines
 
-	Copyright (c) J.S.A.Kapp 1994 - 1995.
+    Copyright (c) J.S.A.Kapp 1994 - 1996.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
