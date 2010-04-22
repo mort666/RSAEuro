@@ -1,7 +1,7 @@
 /*
 	SHSC.C - Secure Hash Standard Code
 
-    Copyright (c) J.S.A.Kapp 1994 - 1996.
+    Copyright (c) J.S.A.Kapp 1994 - 1997.
 
 	RSAEURO - RSA Library compatible with RSAREF(tm) 2.0.
 
@@ -21,6 +21,11 @@
 
         1.03 second revision, SHSFinal modified to output to a char
         array specified by the user.
+
+        1.10 third revision, SHSUpdate revised to allow odd sized 
+        blocks and no longer assume that the block is a multiple
+        of SHS_BLOCKSIZE.  This should be the last revision of this
+        code...  JSAK - 21/05/97.
 */
 
 
@@ -126,8 +131,10 @@ SHS_CTX *context;               /* context */
 
 /* Update SHS for a block of data.
 
-   This code assumes that the buffer size is a multiple of
-   SHS_BLOCKSIZE bytes long.
+   This code nolonger assumes that the buffer 
+   size is a multiple of SHS_BLOCKSIZE bytes long.
+
+   This was fixed by TGS on 12/05/97
 */
 
 void SHSUpdate(context, buffer, count)
@@ -135,12 +142,38 @@ SHS_CTX *context;               /* context */
 BYTE *buffer;										/* input block */
 int count;                      /* length of input block */
 {
+	unsigned char *ptr;
+	UINT4 tmp;
+	int dataCount;
+
+	tmp = context->countLo;
+
 	/* Update bitcount */
 	if((context->countLo + ((UINT4) count << 3)) < context->countLo)
 		 context->countHi++;	/* Carry from low to high bitCount */
 
 	context->countLo += ((UINT4) count << 3);
 	context->countHi += ((UINT4) count >> 29);
+
+	/* Get count of bytes already in data */
+	dataCount = (int) (tmp >> 3) & 0x3F;
+
+	/* Handle any leading odd-sized chunks */
+	if(dataCount) {
+		ptr = (POINTER) context->data + dataCount;
+
+		dataCount = SHS_BLOCKSIZE - dataCount;
+		if(count < dataCount) {
+			R_memcpy(ptr, buffer, count);
+			return;
+		}
+		R_memcpy(ptr, buffer, dataCount);
+		byteReverse(context->data, SHS_BLOCKSIZE);
+		SHSTransform(context);
+		buffer += dataCount;
+		count -= dataCount;
+	}
+
 
 	/* Process data in SHS_BLOCKSIZE chunks */
 	while(count >= SHS_BLOCKSIZE) {
