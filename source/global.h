@@ -34,16 +34,16 @@
 typedef unsigned char *POINTER;
 
 /* UINT2 defines a two byte word */
-typedef unsigned short int UINT2;
+typedef unsigned short UINT2;
 
 /* UINT4 defines a four byte word */
-typedef unsigned long int UINT4;
+typedef unsigned int UINT4;
 
 /* BYTE defines a unsigned character */
 typedef unsigned char BYTE;
 
 /* internal signed value */
-typedef signed long int signeddigit;
+typedef signed int signeddigit;
 
 #ifndef NULL_PTR
 #define NULL_PTR ((POINTER)0)
