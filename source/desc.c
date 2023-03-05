@@ -37,6 +37,7 @@
 
 #include "rsaeuro.h"
 #include "des.h"
+#include <stdint.h>
 
 static UINT2 bytebit[8] = {
 	0200, 0100, 040, 020, 010, 04, 02, 01
@@ -205,7 +206,7 @@ UINT4 Spbox[8][64] = {
 #else
 	/* S box tables for assembler desfunc */
 
-unsigned long Spbox[8][64] = {
+uint32_t Spbox[8][64] = {
 	0x04041000,0x00000000,0x00040000,0x04041010,
 	0x04040010,0x00041010,0x00000010,0x00040000,
 	0x00001000,0x04041000,0x04041010,0x00001000,
@@ -731,7 +732,7 @@ void desfunc(block,ks)
 UINT4 *block;		/* Data block */
 UINT4 *ks;	/* Key schedule */
 {
-	unsigned long left,right,work;
+	uint32_t left,right,work;
 
 	left = block[0];
 	right = block[1];
